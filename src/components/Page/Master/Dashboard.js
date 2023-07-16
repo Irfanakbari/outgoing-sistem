@@ -1,38 +1,63 @@
 import {BiFullscreen} from "react-icons/bi";
-import {Bar, BarChart, ResponsiveContainer, XAxis, YAxis} from "recharts";
-import {useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import axios from "axios";
 import {showErrorToast} from "@/utils/toast";
+import {Card, List, ListItem, Metric, Text} from "@tremor/react";
+import Chart1 from "@/components/Chart/DashboardChart1";
 import dayjs from "dayjs";
+import Chart2 from "@/components/Chart/DashboardChart2";
 
+const cities = [
+    {
+        city: "Athens",
+        rating: "2 open PR",
+    },
+    {
+        city: "Luzern",
+        rating: "1 open PR",
+    },
+    {
+        city: "Zürich",
+        rating: "0 open PR",
+    },
+    {
+        city: "Vienna",
+        rating: "1 open PR",
+    },
+    {
+        city: "Ermatingen",
+        rating: "0 open PR",
+    },
+    {
+        city: "Lisbon",
+        rating: "0 open PR",
+    },
+];
 export default function Dashboard() {
     const [history, setHistory] = useState([])
-    const [palletKeluar, setPalletKeluar] = useState([])
-    const [palletMasuk, setPalletMasuk] = useState([])
-    const [cardInfo, setCardInfo] = useState({})
+
+    const [cardInfo, setCardInfo] = useState({
+        stok: '-',
+        total: '-',
+        keluar:'-',
+        repair: '-'
+    })
+    const [dataChart1, setDataChart1] = useState([])
     const elemRef = useRef(null);
-
-    const [currentTime, setCurrentTime] = useState(new Date());
-
 
 
     useEffect(()=>{
         fetchData()
-        const jam = setInterval(() => {
-            setCurrentTime(new Date());
-        }, 1000);
 
-        const interval = setInterval(fetchData, 3000); // Panggil fetchData setiap 3 detik
+        const interval = setInterval(fetchData, 4000); // Panggil fetchData setiap 3 detik
 
         return () => {
-            clearInterval(jam); // Hentikan interval saat komponen dibongkar
             clearInterval(interval); // Hentikan interval saat komponen dibongkar
         };
     },[])
 
-    const fetchData = async () => {
-        try {
-            const response = await axios.get('/api/dashboard');
+    const fetchData = () => {
+        axios.get('/api/dashboard').then(response =>{
             setCardInfo({
                 stok: response.data['data']['totalStokPallet'],
                 total: response.data['data']['totalPallet'],
@@ -40,11 +65,10 @@ export default function Dashboard() {
                 repair: response.data['data']['totalPalletRepair']
             })
             setHistory(response.data['data']['historyPallet'])
-            setPalletKeluar(response.data['data']['palletKeluar'] ?? [])
-            setPalletMasuk(response.data['data']['palletMasuk'])
-        } catch (error) {
+            setDataChart1(response.data.data['chartStok'])
+        }).catch(e =>{
             showErrorToast("Gagal Fetch Data");
-        }
+        })
     }
     const enterFullscreen = () => {
         if (document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
@@ -77,11 +101,11 @@ export default function Dashboard() {
     };
 
     return(
-        <div className={`bg-white overflow-x-scroll`} ref={elemRef}>
+        <div className={`bg-white h-full`} ref={elemRef}>
             <div className={`bg-[#2589ce] py-1.5 px-2 text-white flex flex-row justify-between`}>
                 <div className={`flex flex-row justify-between w-full mr-1 items-center`}>
                     <h2 className={`font-bold text-[18px]`}>PT VUTEQ INDONESIA</h2>
-                    <h2 className={`font-bold text-[14px]`}>Dasboard Status Pallet :  {currentTime.toLocaleTimeString()}</h2>
+                    <h2 className={`font-bold text-[14px]`}>Dasboard Status Pallet</h2>
                 </div>
                 <div
                     onClick={enterFullscreen}
@@ -89,120 +113,48 @@ export default function Dashboard() {
                     <BiFullscreen size={20}/>
                 </div>
             </div>
-            <div className={`w-full p-2`}>
-                <div className={`grid-cols-4 pt-2 grid gap-5 text-white`}>
-                    <div className={`bg-blue-500 p-4`}>
-                        <h1 className={`font-bold text-4xl mb-5`}>{cardInfo.total ?? '-'}</h1>
-                        <span className={`text-xl`}>Total Stok Pallet</span>
-                    </div>
-                    <div className={`bg-green-500 p-4`}>
-                        <h1 className={`font-bold text-4xl mb-5`}>{cardInfo.stok ?? '-'}</h1>
-                        <span className={`text-xl`}>Stok Tersedia</span>
-                    </div>
-                    <div className={`bg-red-500 p-4`}>
-                        <h1 className={`font-bold text-4xl mb-5`}>{cardInfo.keluar ?? '-'}</h1>
-                        <span className={`text-xl`}>Pallet Keluar</span>
-                    </div>
-                    <div className={`bg-yellow-500 p-4`}>
-                        <h1 className={`font-bold text-4xl mb-5`}>{cardInfo.repair ?? '-'}</h1>
-                        <span className={`text-xl`}>Pallet Repair</span>
-                    </div>
+            <div className={`w-full p-5 h-full`}>
+                <div className={`grid-cols-4 pt-2 grid gap-5 text-white mb-5`}>
+                    <Card className="bg-blue-500" >
+                        <Text className={`text-xl text-white`}>Total Stok</Text>
+                        <Metric className={`font-bold text-white`}>{cardInfo.total } Pallet</Metric>
+                    </Card>
+                    <Card className="bg-green-500" >
+                        <Text className={`text-xl text-white`}>Stok Tersedia</Text>
+                        <Metric className={`font-bold text-white`}>{cardInfo.stok } Pallet</Metric>
+                    </Card>
+                    <Card className="bg-red-500" >
+                        <Text className={`text-xl text-white`}>Keluar</Text>
+                        <Metric className={`font-bold text-white`}>{cardInfo.keluar } Pallet</Metric>
+                    </Card>
+                    <Card className="bg-orange-500">
+                        <Text className={`text-xl text-white`}>Repair</Text>
+                        <Metric className={`font-bold text-white`}>{cardInfo.repair } Pallet</Metric>
+                    </Card>
                 </div>
-                <div className="grid-cols-3 pt-2 grid gap-5">
-                    <div className="border-2 border-black flex flex-col min-h-[10cm] mb-5">
-                        <div className="w-full bg-blue-800 text-white p-2 font-semibold">Diagram Stok</div>
-                        <div style={{ width: '100%', height: '100%' }} className={`p-5`}>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={[
-                                    {
-                                        name:"Tersedia",
-                                        fill:"blue",
-                                        stok: cardInfo.stok
-                                    },
-                                    {
-                                        name:"Keluar",
-                                        fill: "red",
-                                        stok: cardInfo.keluar
-                                    },
-                                    {
-                                        name:"Maintenance",
-                                        fill:"yellow",
-                                        stok: cardInfo.repair
-                                    }
-                                ]}>
-                                    <Bar dataKey="stok" fill="#3884d8" />
-                                    <XAxis dataKey="name"/>
-                                    <YAxis />
-                                </BarChart>
-                            </ResponsiveContainer>
+                <div className={`w-full grid grid-cols-2 gap-4`}>
+                    <Chart2 data={dataChart1} />
+                    <Card className={`overflow-y-scroll]`}>
+                        <div className={`bg-red-800 text-white p-2 font-semibold`}>
+                            Detail Stok
                         </div>
-                    </div>
-                    <div className={`border-2 border-black mb-5 overflow-y-scroll`}>
-                        <div className={`w-full bg-red-800 text-white p-2 font-semibold`}>
-                            Pallet Keluar
-                        </div>
-                        <table className="divide-y w-full divide-gray-200">
-                            <thead>
-                            <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Kode Pallet
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Tujuan
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Time
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                            {
-                                palletKeluar.map((val, index) =>(
-                                    <tr key={index}>
-                                        <td className="px-6 py-4 whitespace-nowrap">{val.kode}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{val.customer}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{
-                                            val['updated_at'] ? dayjs(val['updated_at']).locale('id').format('DD MMMM YYYY HH:mm') : '-'
-                                        }</td>
-                                    </tr>
-                                ))
-                            }
-                            </tbody>
-                        </table>
-                    </div>
-                    <div className={`border-2 border-black mb-5 overflow-y-scroll`}>
-                        <div className={`w-full bg-green-800 text-white p-2 font-semibold`}>
-                            Pallet Masuk
-                        </div>
-                        <table className="divide-y w-full divide-gray-200">
-                            <thead>
-                            <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Kode Pallet
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Tujuan
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Time
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                            {
-                                palletMasuk.map((val, index) =>(
-                                    <tr key={index}>
-                                        <td className="px-6 py-4 whitespace-nowrap">{val.kode}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{val.customer}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{
-                                            val['updated_at'] ? dayjs(val['updated_at']).locale('id').format('DD MMMM YYYY HH:mm') : '-'
-                                        }</td>
-                                    </tr>
-                                ))
-                            }
-                            </tbody>
-                        </table>
-                    </div>
+                       <div className={`flex`}>
+                           <List className={`p-2`}>
+                               {
+                                   dataChart1.map((item, index) => {
+                                       if (index < 7) {
+                                           return (
+                                               <ListItem className={`text-sm`} key={item.customer}>
+                                                   <span>{item.customer}</span>
+                                                   <span>{item.Total} Pallet</span>
+                                               </ListItem>
+                                           )
+                                       }
+                                   } )}
+                           </List>
+                       </div>
+                    </Card>
+                    <Chart1 data={dataChart1} />
                 </div>
                 <div className={`w-full`}>
                     <div className={`bg-red-800 text-white p-2 font-semibold`}>
@@ -246,7 +198,7 @@ export default function Dashboard() {
                                         <td className="px-6 py-4 whitespace-nowrap">{
                                             val['keluar'] ? dayjs(val['keluar']).locale('id').format('DD MMMM YYYY HH:mm') : '-'
                                         }</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{val.user_in}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">{val.user_in ?? '-'}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{
                                             val['masuk'] ? dayjs(val['masuk']).locale('id').format('DD MMMM YYYY HH:mm') : '-'
                                         }</td>

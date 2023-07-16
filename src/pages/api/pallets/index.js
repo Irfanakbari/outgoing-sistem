@@ -10,6 +10,7 @@ async function handler(req, res) {
     switch (req.method) {
         case 'GET':
             try {
+                const { customer, vehicle } = req.query;
                 // Menentukan parameter halaman dan batasan data
                 const page = parseInt(req.query.page) || 1; // Halaman saat ini (default: 1)
                 const limit = parseInt(req.query.limit) || 20; // Batasan data per halaman (default: 10)
@@ -17,7 +18,25 @@ async function handler(req, res) {
                 // Menghitung offset berdasarkan halaman dan batasan data
                 const offset = (page - 1) * limit;
 
+                let whereClause = {}; // Inisialisasi objek kosong untuk kondisi where
+
+                if (customer && vehicle) {
+                    whereClause = {
+                        '$Customer.kode$': customer,
+                        '$Vehicle.kode$': vehicle,
+                    };
+                } else if (customer) {
+                    whereClause = {
+                        '$Customer.kode$': customer,
+                    };
+                } else if (vehicle) {
+                    whereClause = {
+                        '$Vehicle.kode$': vehicle,
+                    };
+                }
+
                 const pallets = await Pallet.findAndCountAll({
+                    where: whereClause,
                     include: [Vehicle, Customer, Part],
                     limit,
                     offset,
@@ -96,7 +115,6 @@ async function handler(req, res) {
                 res.status(200).json({ success: true });
 
             } catch (error) {
-                console.error('Failed to save Pallet:', error);
                 res.status(500).json({ success: false, error: 'Failed to save Pallet' });
             }
     }

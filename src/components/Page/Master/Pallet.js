@@ -21,6 +21,8 @@ export default function Pallet() {
 
     const [searchTerm, setSearchTerm] = useState('');
     const [filters, setFilters] = useState([])
+    const custFilter = useRef(null);
+    const vehicleFilter = useRef(null);
 
     const [closeModal, setCloseModal] = useState(false)
     const [closeAddModal, setCloseAddModal] = useState(false)
@@ -63,7 +65,7 @@ export default function Pallet() {
            showErrorToast("Gagal Hapus Data")
         } finally {
             setCloseModal(false)
-            await fetchData()
+            await getFilter()
         }
     }
 
@@ -101,7 +103,7 @@ export default function Pallet() {
                 part: partInput.current.value
             }).then(r =>{
                 showSuccessToast("Sukses Simpan Data")
-                fetchData()
+                getFilter()
             })
         } catch (e) {
             showErrorToast("Gagal Simpan Data")
@@ -175,6 +177,17 @@ export default function Pallet() {
         }));
         await excel.download(data)
     }
+
+    const getFilter = async () => {
+        try {
+            const response = await axios.get(`/api/pallets?customer=${custFilter.current.value}&vehicle=${vehicleFilter.current.value}&page=1`);
+            setdataPallet(response.data);
+            setFilters(response.data['data']);
+        } catch (error) {
+            showErrorToast("Gagal Fetch Data");
+        }
+    };
+
 
     return(
         <div className={`h-full bg-white`}>
@@ -303,24 +316,58 @@ export default function Pallet() {
                     <BiSolidUpArrow  size={10}/>
                 </div>
             </div>
-            <div className={`w-full flex items-center bg-white px-3 py-2`}>
-                <label className={`text-sm font-semibold mr-3`}>Cari : </label>
-                <input
-                    type="text"
-                    className="border border-gray-300 rounded mr-3"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <ImCross
-                    className="hover:cursor-pointer text-blue-700 mr-4"
-                    onClick={() => setSearchTerm('')}
-                />
-                <button
-                    className="bg-green-500 py-1 px-2 text-white font-semibold text-sm"
-                    onClick={handleSearch}
-                >
-                    Dapatkan Data
-                </button>
+            <div className="w-full gap-8 flex items-center bg-white px-3 py-2">
+                <div className="flex flex-row items-center">
+                    <label className="text-sm font-semibold mr-3">Cari :</label>
+                    <input
+                        type="text"
+                        className="border border-gray-300 rounded mr-3"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <ImCross
+                        className="hover:cursor-pointer text-blue-700 mr-4"
+                        onClick={() => setSearchTerm('')}
+                    />
+                    <button
+                        className="bg-green-500 py-1 px-2 text-white font-semibold text-sm"
+                        onClick={handleSearch}
+                    >
+                        Dapatkan Data
+                    </button>
+                </div>
+                <div className="flex flex-row items-center">
+                    <label className="text-sm font-semibold mr-3">Customer :</label>
+                    <select ref={custFilter} className="border border-gray-300 rounded p-1 text-sm">
+                        <option className="text-sm" value="">
+                            Semua
+                        </option>
+                        {dataCust.map((e, index) => (
+                            <option className="text-sm p-4" key={index} value={e['kode']}>
+                                {`${e['kode']} - ${e['name']}`}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div className="flex flex-row items-center">
+                    <label className="text-sm font-semibold mr-3">Vehicle :</label>
+                    <select ref={vehicleFilter} className="border border-gray-300 rounded p-1 text-sm">
+                        <option className="text-sm" value="">
+                            Semua
+                        </option>
+                        {dataVehicle.map((e, index) => (
+                            <option className="text-sm" key={index} value={e['kode']}>
+                                {`${e['kode']} - ${e['name']}`}
+                            </option>
+                        ))}
+                    </select>
+                    <button
+                        className="ml-3 bg-green-500 py-1 px-2 text-white font-semibold text-sm"
+                        onClick={getFilter}
+                    >
+                        Dapatkan Data
+                    </button>
+                </div>
             </div>
             <div className={`w-full bg-white h-4 border border-gray-500`} />
             <div className={`w-full bg-white p-2`}>

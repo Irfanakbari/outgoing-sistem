@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import dayjs from "dayjs";
 import { useExcelJS } from "react-use-exceljs";
 import PaginationSelect from "@/components/PaginationSelect";
+import {showErrorToast} from "@/utils/toast";
 
 export default function LapRiwayat() {
     const [dataHistory, setDataHistory] = useState([]);
@@ -20,6 +21,8 @@ export default function LapRiwayat() {
 
     const custFilter = useRef(null);
     const vehicleFilter = useRef(null);
+    const startDate = useRef(null);
+    const endDate = useRef(null);
 
     useEffect(() => {
         fetchData();
@@ -28,7 +31,7 @@ export default function LapRiwayat() {
     const getHistory = async (e) => {
         e.preventDefault()
         try {
-            const response = await axios.get(`/api/history?customer=${custFilter.current.value}&vehicle=${vehicleFilter.current.value}&page=1`);
+            const response = await axios.get(`/api/history?customer=${custFilter.current.value}&vehicle=${vehicleFilter.current.value}&start=${startDate.current.value}&end=${endDate.current.value}&page=1`);
             setDataHistory(response.data);
             setFilters(response.data['data']);
         } catch (error) {
@@ -69,7 +72,7 @@ export default function LapRiwayat() {
 
     const handlePageChange = async (selectedPage) => {
         // Lakukan perubahan halaman di sini
-        const response3 = await axios.get(`/api/history?customer=${custFilter.current.value}&vehicle=${vehicleFilter.current.value}&page=` + selectedPage);
+        const response3 = await axios.get(`/api/history?customer=${custFilter.current.value}&vehicle=${vehicleFilter.current.value}&start=${startDate.current.value}&end=${endDate.current.value}&page=` + selectedPage);
         setDataHistory(response3.data);
         setFilters(response3.data['data'])
     };
@@ -151,18 +154,6 @@ export default function LapRiwayat() {
         await excel.download(data);
     };
 
-    const showErrorToast = (message) => {
-        toast.error(message, {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-        });
-    };
 
     return (
         <div className="h-full bg-white">
@@ -217,6 +208,16 @@ export default function LapRiwayat() {
                             </option>
                         ))}
                     </select>
+                </div>
+                <div className="flex flex-row justify-between items-center">
+                    <div>
+                        <label className="text-sm font-semibold mr-3">Tanggal Awal :</label>
+                        <input ref={startDate} type={'date'} className={`border border-gray-300 rounded p-1 text-sm`} />
+                    </div>
+                    <div className={`ml-3`}>
+                        <label className="text-sm font-semibold mr-3">Tanggal Akhir :</label>
+                        <input ref={endDate} type={'date'} className={`border border-gray-300 rounded p-1 text-sm`} />
+                    </div>
                     <button
                         className="ml-3 bg-green-500 py-1 px-2 text-white font-semibold text-sm"
                         onClick={getHistory}

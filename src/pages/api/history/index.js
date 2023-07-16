@@ -5,13 +5,15 @@ import History from "@/models/History";
 import connection from "@/config/database";
 import checkCookieMiddleware from "@/pages/api/middleware";
 import Part from "@/models/Part";
+import {Op} from "sequelize";
 
 async function handler(req, res) {
     switch (req.method) {
         case 'GET':
-            const { customer, vehicle, page } = req.query;
+            const { customer, vehicle, page, start, end } = req.query;
             try {
                 let whereClause = {}; // Inisialisasi objek kosong untuk kondisi where
+
 
                 if (customer && vehicle) {
                     whereClause = {
@@ -27,6 +29,41 @@ async function handler(req, res) {
                         '$Pallet.Vehicle.kode$': vehicle,
                     };
                 }
+
+                if (start && end) {
+                    const startDate = new Date(start);
+                    startDate.setHours(0, 0, 0, 0); // Set start time to 00:00:00
+                    const endDate = new Date(end);
+                    endDate.setHours(23, 59, 59, 999); // Set end time to 23:59:59.999
+
+                    whereClause = {
+                        ...whereClause,
+                        keluar: {
+                            [Op.between]: [startDate.toISOString(), endDate.toISOString()],
+                        },
+                    };
+                } else if (start) {
+                    const startDate = new Date(start);
+                    startDate.setHours(0, 0, 0, 0); // Set start time to 00:00:00
+
+                    whereClause = {
+                        ...whereClause,
+                        keluar: {
+                            [Op.gte]: startDate.toISOString(),
+                        },
+                    };
+                } else if (end) {
+                    const endDate = new Date(end);
+                    endDate.setHours(23, 59, 59, 999); // Set end time to 23:59:59.999
+
+                    whereClause = {
+                        ...whereClause,
+                        keluar: {
+                            [Op.lte]: endDate.toISOString(),
+                        },
+                    };
+                }
+
 
                 // Menghitung offset berdasarkan halaman dan batasan data
                 const offset = (parseInt(page) - 1) * 20;
@@ -62,6 +99,7 @@ async function handler(req, res) {
                     currentPage: parseInt(page),
                 });
             } catch (e) {
+                console.log(e.message);
                 res.status(500).json({
                     ok: false,
                     data: "Internal Server Error",

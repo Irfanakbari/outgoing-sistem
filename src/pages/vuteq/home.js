@@ -50,9 +50,9 @@ export default function Home() {
         getCurrentUser()
     },[])
 
-    async function getCurrentUser(){
-        const user = await axios.get('/api/auth/user');
-        setUser(user.data['data'])
+    function getCurrentUser(){
+        axios.get('/api/auth/user').then(r =>  setUser(r.data['data']));
+
     }
 
     return (
@@ -61,7 +61,7 @@ export default function Home() {
                 <title>Home | PT Vuteq Indonesia</title>
             </Head>
             <div className={`p-2 min-h-screen flex overflow-x-scroll`}>
-                <div className={`w-full bg-white border border-gray-500 h-full flex flex-col`}>
+                <div className={`w-full bg-white border border-gray-500 h-full`}>
                     <HeadTitle user={user} />
                     <div className={`p-2`}>
                         <div className={`w-full flex bg-[#EBEBEB] text-sm font-bold`}>
@@ -73,7 +73,7 @@ export default function Home() {
                                     Master Data
                                 </span>
                                 {
-                                    dropdown1 ? <div className={`px-8 py-2 bg-white shadow-2xl shadow-gray-500 absolute flex flex-col gap-2`}>
+                                    dropdown1 ? <div className={`px-8 z-10 py-2 bg-white shadow-2xl shadow-gray-500 absolute flex flex-col gap-2`}>
                                     <span onClick={()=>{setNewTab('Customer')}}>
                                         Customer
                                     </span>

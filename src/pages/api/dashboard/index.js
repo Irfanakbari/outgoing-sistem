@@ -1,22 +1,56 @@
 import Pallet from "@/models/Pallet";
 import checkCookieMiddleware from "@/pages/api/middleware";
-import {Sequelize, where} from "sequelize";
+import Customer from "@/models/Customer";
 import History from "@/models/History";
 
 async function handler(req, res) {
     switch (req.method) {
         case 'GET':
             try {
-                const stokPallet = await Pallet.findAll({
-                    where: {
-                        status: 1,
-                    },
-                    attributes: [
-                        'part',
-                        [Sequelize.fn('COUNT', Sequelize.col('part')), 'total'],
-                    ],
-                    group: 'part',
+                const customers = await Customer.findAll()
+
+
+                const customerPromises = customers.map(async (customer) => {
+                    const palletCounts = {};
+
+                    palletCounts['total'] = await Pallet.count({
+                        where: {
+                            customer: customer['kode'],
+                        }
+                    });
+
+                    palletCounts['keluar'] = await Pallet.count({
+                        where: {
+                            customer: customer['kode'],
+                            status: 0
+                        }
+                    });
+
+                    palletCounts['tersedia'] = await Pallet.count({
+                        where: {
+                            customer: customer['kode'],
+                            status: 1
+                        }
+                    });
+
+                    palletCounts['maintenance'] = await Pallet.count({
+                        where: {
+                            customer: customer['kode'],
+                            status: 3
+                        }
+                    });
+
+                    return {
+                        customer: customer['name'],
+                        Total: palletCounts.total,
+                        Tersedia: palletCounts.tersedia,
+                        Keluar: palletCounts.keluar,
+                        Maintenance: palletCounts.maintenance
+                    };
                 });
+
+                const customerPallets = await Promise.all(customerPromises);
+
 
                 const totalPallet = await Pallet.count()
                 const totalStokPallet = await Pallet.count({
@@ -35,22 +69,6 @@ async function handler(req, res) {
                     }
                 })
 
-                const palletKeluar = await Pallet.findAll({
-                    where: {
-                        status: 0
-                    },
-                    limit: 5,
-                    order: [['updated_at', 'DESC']]
-                });
-
-                const palletMasuk = await Pallet.findAll({
-                    where: {
-                        status: 1
-                    },
-                    limit: 5,
-                    order: [['updated_at', 'DESC']]
-                });
-
                 const historyPallet = await History.findAll({
                     limit: 5,
                     include: [Pallet],
@@ -59,14 +77,12 @@ async function handler(req, res) {
 
                 res.status(200).json({
                     data : {
-                        chartStok : stokPallet,
+                        chartStok : customerPallets,
                         totalPallet,
                         totalStokPallet,
                         totalPalletKeluar,
                         totalPalletRepair,
-                        historyPallet,
-                        palletKeluar,
-                        palletMasuk
+                        historyPallet
                     }
                 });
             } catch (error) {
