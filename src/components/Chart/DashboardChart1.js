@@ -1,4 +1,4 @@
-import { Card, Title, BarChart, Subtitle } from "@tremor/react";
+import { Card, Title, BarChart } from "@tremor/react";
 
 
 export default function Chart1({data}) {

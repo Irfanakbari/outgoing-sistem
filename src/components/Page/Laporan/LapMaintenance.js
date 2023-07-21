@@ -6,12 +6,13 @@ import axios from "axios";
 import { useExcelJS } from "react-use-exceljs"
 import PaginationSelect from "@/components/PaginationSelect";
 import {showErrorToast} from "@/utils/toast";
+import {dataState} from "@/context/states";
 
 
 export default function LapMaintenance() {
     const [dataMaintenance, setDataMaintenance] = useState([])
-    const [dataCustomer, setDataCustomer] = useState([])
-    const [dataProject, setDataProject] = useState([])
+    const {listCustomer, listVehicle} = dataState()
+
 
     const [selectedCell, setSelectedCell] = useState(null)
 
@@ -27,10 +28,6 @@ export default function LapMaintenance() {
     }, [])
     const fetchData = async () => {
         try {
-            const response1 = await axios.get('/api/customers');
-            setDataCustomer(response1.data['data']);
-            const response2 = await axios.get('/api/vehicle');
-            setDataProject(response2.data['data']);
             const response = await axios.get('/api/repairs?page=1');
             setDataMaintenance(response.data);
             setFilters(response.data['data'])
@@ -172,7 +169,7 @@ export default function LapMaintenance() {
                             Semua
                         </option>
                         {
-                            dataCustomer.map((e,index) =>(
+                            listCustomer.map((e,index) =>(
                                 <option className={`text-sm`} key={index} value={e['kode']}>
                                     {
                                         `${e['kode']} - ${e['name']}`
@@ -192,7 +189,7 @@ export default function LapMaintenance() {
                             Semua
                         </option>
                         {
-                            dataProject.map((e,index) =>(
+                            listVehicle.map((e,index) =>(
                                 <option className={`text-sm`} key={index} value={e['kode']}>
                                     {
                                         `${e['kode']} - ${e['name']}`

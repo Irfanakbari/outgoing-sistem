@@ -7,6 +7,12 @@ async function handler(req, res) {
     switch (req.method) {
         case 'GET':
             try {
+                if (req.user.role !== 'admin') {
+                    res.status(401).json({
+                        ok: false,
+                        data: "Role must be admin"
+                    });
+                }
                 const customers = await Customer.findAll()
 
 
@@ -94,4 +100,4 @@ async function handler(req, res) {
 }
 const protectedAPIHandler = checkCookieMiddleware(handler);
 
-export default handler;
+export default protectedAPIHandler;

@@ -1,12 +1,17 @@
 import checkCookieMiddleware from "@/pages/api/middleware";
 import Customer from "@/models/Customer";
-import {Op} from "sequelize";
 import Part from "@/models/Part";
 
 async function handler(req, res) {
     switch (req.method) {
         case 'GET':
             try {
+                if (req.user.role !== 'admin') {
+                    res.status(401).json({
+                        ok: false,
+                        data: "Role must be admin"
+                    });
+                }
                 const parts = await Part.findAll({
                     include: [Customer]
                 })
@@ -24,6 +29,12 @@ async function handler(req, res) {
         case 'POST':
             const { name, customer, kode } = req.body;
             try {
+                if (req.user.role !== 'admin') {
+                    res.status(401).json({
+                        ok: false,
+                        data: "Role must be admin"
+                    });
+                }
                 await Part.create({
                     kode: customer + kode,
                     name: name,
@@ -36,7 +47,6 @@ async function handler(req, res) {
                     const message = `Duplikat data pada kolom ${field}`;
                     res.status(400).json({ success: false, error: message });
                 } else {
-                    console.log(error);
                     res.status(500).json({ success: false, error: error.message });
                 }
             }

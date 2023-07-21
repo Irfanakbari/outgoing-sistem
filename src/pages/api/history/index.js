@@ -12,6 +12,12 @@ async function handler(req, res) {
         case 'GET':
             const { customer, vehicle, page, start, end } = req.query;
             try {
+                if (req.user.role !== 'admin') {
+                    res.status(401).json({
+                        ok: false,
+                        data: "Role must be admin"
+                    });
+                }
                 let whereClause = {}; // Inisialisasi objek kosong untuk kondisi where
 
 
@@ -99,7 +105,6 @@ async function handler(req, res) {
                     currentPage: parseInt(page),
                 });
             } catch (e) {
-                console.log(e.message);
                 res.status(500).json({
                     ok: false,
                     data: "Internal Server Error",

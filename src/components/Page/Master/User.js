@@ -1,12 +1,12 @@
-import {BiEdit, BiPlusMedical, BiPrinter, BiRefresh, BiSolidUpArrow} from "react-icons/bi";
+import {BiEdit, BiPlusMedical, BiRefresh, BiSolidUpArrow} from "react-icons/bi";
 import {ImCross} from "react-icons/im";
 import {BsFillTrashFill} from "react-icons/bs";
 import axios from "axios";
-import {toast} from "react-toastify";
 import {useEffect, useState} from "react";
 import DeleteModal from "@/components/Modal/DeleteModal";
 import {FaRegWindowMaximize} from "react-icons/fa";
 import {showErrorToast, showSuccessToast} from "@/utils/toast";
+import {useForm} from "react-hook-form";
 
 export default function User() {
     const [dataUser, setDataUser] = useState([])
@@ -15,8 +15,11 @@ export default function User() {
     const [closeAddModal, setCloseAddModal] = useState(false)
     const [closeEditModal, setCloseEditModal] = useState(false)
 
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
+    const {
+        register,
+        handleSubmit,
+        reset
+    } = useForm()
 
     useEffect(()=>{
         fetchData()
@@ -33,13 +36,9 @@ export default function User() {
         }
     };
 
-    const submitData = async (e) => {
-        e.preventDefault();
+    const submitData = async (data) => {
         try {
-            await axios.post('/api/users',{
-                username : username,
-                password : password,
-            }).then(r =>{
+            await axios.post('/api/users',data).then(() =>{
                 showSuccessToast("Sukses Simpan Data");
                 fetchData()
             })
@@ -51,12 +50,9 @@ export default function User() {
         }
     }
 
-    const editData = async (e) => {
-        e.preventDefault();
+    const editData = async (data) => {
         try {
-            await axios.put('/api/users/' + selectedCell.id,{
-                password : password,
-            }).then(r =>{
+            await axios.put('/api/users/' + selectedCell.id,data).then(() =>{
                 showSuccessToast("Sukses Edit Data");
                 fetchData()
             })
@@ -77,7 +73,7 @@ export default function User() {
 
         } finally {
             setCloseModal(false)
-            fetchData()
+            await fetchData()
         }
     }
 
@@ -103,29 +99,38 @@ export default function User() {
                                     <ImCross size={10} />
                                 </div>
                             </div>
-                            <div className={`p-2 flex flex-col gap-5`}>
-                                <div className={`border border-gray-300 w-full p-3 flex flex-col gap-3 text-sm`}>
-                                    <div className={`flex flex-row w-full justify-between items-center gap-2`}>
-                                        <label className={`w-1/4`}>Username : </label>
-                                        <input
-                                            onChange={event => setUsername(event.target.value)}
-                                            className={`border border-gray-300 p-1 flex-grow`} />
+                            <form onSubmit={handleSubmit(submitData)}>
+                                <div className="p-2 flex flex-col gap-5">
+                                    <div className="border border-gray-300 w-full p-3 flex flex-col gap-3 text-sm">
+                                        <div className="flex flex-row w-full justify-between items-center gap-2">
+                                            <label className="w-1/4">Username : </label>
+                                            <input {...register("username")} className="border border-gray-300 p-1 flex-grow" />
+                                        </div>
+                                        <div className="flex flex-row w-full justify-between items-center gap-2">
+                                            <label className="w-1/4">Password : </label>
+                                            <input type={'password'} {...register("password")} className="border border-gray-300 p-1 flex-grow" />
+                                        </div>
+                                        <div className="flex flex-row w-full justify-between items-center gap-2">
+                                            <label className="w-1/4">Role User :</label>
+                                            <select {...register("role")} className="border border-gray-300 p-1 flex-grow" >
+                                                <option value={'admin'}>Admin</option>
+                                                <option value={'operator'}>Operator</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                    <div className={`flex flex-row w-full justify-between items-center gap-2`}>
-                                        <label className={`w-1/4`}>Password : </label>
-                                        <input
-                                            type={`password`}
-                                            onChange={event => setPassword(event.target.value)}
-                                            className={`border border-gray-300 p-1 flex-grow`} />
+                                    <div className="border border-gray-300 w-full p-3 flex flex-col gap-3 text-sm">
+                                        <div className="flex flex-row justify-center gap-2">
+                                            <input type={'submit'} className="bg-[#f17373] w-full text-white py-1 text-sm rounded"/>
+                                            <button onClick={() => {
+                                                setCloseAddModal(false)
+                                                reset()
+                                            }} className="border w-full border-gray-500 py-1 text-sm rounded">
+                                                Batal
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className={`border border-gray-300 w-full p-3 flex flex-col gap-3 text-sm`}>
-                                    <div className={`flex flex-row justify-center gap-2`}>
-                                        <button onClick={submitData} className={`bg-[#f17373] w-full text-white py-1 text-sm rounded`}>Simpan</button>
-                                        <button onClick={()=> setCloseAddModal(false)} className={`border w-full border-gray-500 py-1 text-sm rounded`}>Batal</button>
-                                    </div>
-                                </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
                     : null
@@ -143,30 +148,31 @@ export default function User() {
                                     <ImCross size={10} />
                                 </div>
                             </div>
-                            <div className={`p-2 flex flex-col gap-5`}>
-                                <div className={`border border-gray-300 w-full p-3 flex flex-col gap-3 text-sm`}>
-                                    <div className={`flex flex-row w-full justify-between items-center gap-2`}>
-                                        <label className={`w-1/4`}>Username : </label>
-                                        <input
-                                            disabled={true}
-                                            defaultValue={selectedCell.username}
-                                            className={`border border-gray-300 p-1 flex-grow`} />
+                            <form onSubmit={handleSubmit(editData)}>
+                                <div className="p-2 flex flex-col gap-5">
+                                    <div className="border border-gray-300 w-full p-3 flex flex-col gap-3 text-sm">
+                                        <div className="flex flex-row w-full justify-between items-center gap-2">
+                                            <label className="w-1/4">Username : </label>
+                                            <input defaultValue={selectedCell.username} {...register("username")} disabled className="border border-gray-300 p-1 flex-grow" />
+                                        </div>
+                                        <div className="flex flex-row w-full justify-between items-center gap-2">
+                                            <label className="w-1/4">Password : </label>
+                                            <input {...register("password")} className="border border-gray-300 p-1 flex-grow" />
+                                        </div>
                                     </div>
-                                    <div className={`flex flex-row w-full justify-between items-center gap-2`}>
-                                        <label className={`w-1/4`}>Password : </label>
-                                        <input
-                                            type={`password`}
-                                            onChange={event => setPassword(event.target.value)}
-                                            className={`border border-gray-300 p-1 flex-grow`} />
+                                    <div className="border border-gray-300 w-full p-3 flex flex-col gap-3 text-sm">
+                                        <div className="flex flex-row justify-center gap-2">
+                                            <input type={'submit'} className="bg-[#f17373] w-full text-white py-1 text-sm rounded"/>
+                                            <button onClick={() => {
+                                                setCloseEditModal(false)
+                                                reset()
+                                            }} className="border w-full border-gray-500 py-1 text-sm rounded">
+                                                Batal
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className={`border border-gray-300 w-full p-3 flex flex-col gap-3 text-sm`}>
-                                    <div className={`flex flex-row justify-center gap-2`}>
-                                        <button onClick={editData} className={`bg-[#f17373] w-full text-white py-1 text-sm rounded`}>Simpan</button>
-                                        <button onClick={()=> setCloseEditModal(false)} className={`border w-full border-gray-500 py-1 text-sm rounded`}>Batal</button>
-                                    </div>
-                                </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
                     : null

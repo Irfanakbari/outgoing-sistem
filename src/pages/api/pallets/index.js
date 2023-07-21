@@ -4,12 +4,17 @@ import Vehicle from "@/models/Vehicle";
 import {Op} from "sequelize";
 import checkCookieMiddleware from "@/pages/api/middleware";
 import Part from "@/models/Part";
-import pallet from "@/models/Pallet";
 
 async function handler(req, res) {
     switch (req.method) {
         case 'GET':
             try {
+                if (req.user.role !== 'admin') {
+                    res.status(401).json({
+                        ok: false,
+                        data: "Role must be admin"
+                    });
+                }
                 const { customer, vehicle } = req.query;
                 // Menentukan parameter halaman dan batasan data
                 const page = parseInt(req.query.page) || 1; // Halaman saat ini (default: 1)
@@ -62,6 +67,12 @@ async function handler(req, res) {
             const { vehicle, part, name, customer } = req.body;
 
             try {
+                if (req.user.role !== 'admin') {
+                    res.status(401).json({
+                        ok: false,
+                        data: "Role must be admin"
+                    });
+                }
                 // Dapatkan data project berdasarkan kode_project
                 const vehicles = await Vehicle.findOne({
                     where: {

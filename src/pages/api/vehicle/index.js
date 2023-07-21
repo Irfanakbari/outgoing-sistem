@@ -1,13 +1,18 @@
 import Vehicle from "@/models/Vehicle";
 import checkCookieMiddleware from "@/pages/api/middleware";
 import Customer from "@/models/Customer";
-import Pallet from "@/models/Pallet";
 import {Op} from "sequelize";
 
 async function handler(req, res) {
     switch (req.method) {
         case 'GET':
             try {
+                if (req.user.role !== 'admin') {
+                    res.status(401).json({
+                        ok: false,
+                        data: "Role must be admin"
+                    });
+                }
                 const vehicles = await Vehicle.findAll({
                     include: [Customer]
                 })
@@ -25,6 +30,12 @@ async function handler(req, res) {
         case 'POST':
             const { name, customer} = req.body;
             try {
+                if (req.user.role !== 'admin') {
+                    res.status(401).json({
+                        ok: false,
+                        data: "Role must be admin"
+                    });
+                }
                 // Dapatkan daftar valet berdasarkan kode_project untuk mencari urutan kosong
                 const vehicles = await Vehicle.findAll({ where: { kode: { [Op.like]: `${customer}%` } } });
 

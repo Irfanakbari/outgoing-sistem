@@ -3,16 +3,15 @@ import { ImCross } from "react-icons/im";
 import { AiFillFileExcel } from "react-icons/ai";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
 import dayjs from "dayjs";
 import { useExcelJS } from "react-use-exceljs";
 import PaginationSelect from "@/components/PaginationSelect";
 import {showErrorToast} from "@/utils/toast";
+import {dataState} from "@/context/states";
 
 export default function LapRiwayat() {
+    const {listCustomer, listVehicle} = dataState()
     const [dataHistory, setDataHistory] = useState([]);
-    const [dataCustomer, setDataCustomer] = useState([]);
-    const [dataProject, setDataProject] = useState([]);
 
     const [selectedCell, setSelectedCell] = useState(null);
 
@@ -41,10 +40,6 @@ export default function LapRiwayat() {
 
     const fetchData = async () => {
         try {
-            const response1 = await axios.get('/api/customers');
-            setDataCustomer(response1.data['data']);
-            const response2 = await axios.get('/api/vehicle');
-            setDataProject(response2.data['data']);
             const response = await axios.get(`/api/history?page=1`);
             setDataHistory(response.data);
             setFilters(response.data['data']);
@@ -189,7 +184,7 @@ export default function LapRiwayat() {
                         <option className="text-sm" value="">
                             Semua
                         </option>
-                        {dataCustomer.map((e, index) => (
+                        {listCustomer.map((e, index) => (
                             <option className="text-sm p-4" key={index} value={e['kode']}>
                                 {`${e['kode']} - ${e['name']}`}
                             </option>
@@ -202,7 +197,7 @@ export default function LapRiwayat() {
                         <option className="text-sm" value="">
                             Semua
                         </option>
-                        {dataProject.map((e, index) => (
+                        {listVehicle.map((e, index) => (
                             <option className="text-sm" key={index} value={e['kode']}>
                                 {`${e['kode']} - ${e['name']}`}
                             </option>

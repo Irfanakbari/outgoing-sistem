@@ -1,13 +1,17 @@
 import User from "@/models/User";
 import bcrypt from "bcrypt";
-import {getCookie} from "cookies-next";
 import checkCookieMiddleware from "@/pages/api/middleware";
 
 async function handler(req, res) {
     switch (req.method) {
         case 'GET':
             try {
-                console.log(getCookie('@vuteq-corp',{req, res}))
+                if (req.user.role !== 'admin') {
+                    res.status(401).json({
+                        ok: false,
+                        data: "Role must be admin"
+                    });
+                }
                 const users = await User.findAll()
                 res.status(200).json({
                     ok : true,
@@ -22,11 +26,18 @@ async function handler(req, res) {
             break;
         case 'POST':
             try {
+                if (req.user.role !== 'admin') {
+                    res.status(401).json({
+                        ok: false,
+                        data: "Role must be admin"
+                    });
+                }
                 const newUser = req.body; // Anggap req.body berisi data pelanggan baru
                 const hash = bcrypt.hashSync(newUser.password, 10);
-                const user = await User.create({
+                await User.create({
                     username : newUser.username,
-                    password : hash
+                    password : hash,
+                    role : newUser.role
                 });
                 res.status(201).json({
                     ok: true,

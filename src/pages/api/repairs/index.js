@@ -6,6 +6,12 @@ async function handler(req, res) {
         case 'GET':
             const { page } = req.query;
             try {
+                if (req.user.role !== 'admin') {
+                    res.status(401).json({
+                        ok: false,
+                        data: "Role must be admin"
+                    });
+                }
                 // Menghitung offset berdasarkan halaman dan batasan data
                 const offset = (parseInt(page) - 1) * parseInt('20');
 

@@ -6,6 +6,12 @@ async function handler(req, res) {
     switch (req.method) {
         case 'DELETE':
             try {
+                if (req.user.role !== 'admin') {
+                    res.status(401).json({
+                        ok: false,
+                        data: "Role must be admin"
+                    });
+                }
                 const userId = req.query.kode; // Anggap req.body.id berisi ID pelanggan yang akan dihapus
                 await User.destroy({
                     where: {
@@ -25,6 +31,12 @@ async function handler(req, res) {
             break;
         case 'PUT':
             try {
+                if (req.user.role !== 'admin') {
+                    res.status(401).json({
+                        ok: false,
+                        data: "Role must be admin"
+                    });
+                }
                 const userId = req.query.kode;
                 const newUser = req.body
                 const hash = bcrypt.hashSync(newUser.password, 10);

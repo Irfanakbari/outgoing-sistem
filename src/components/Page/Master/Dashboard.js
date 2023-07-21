@@ -6,33 +6,8 @@ import {Card, List, ListItem, Metric, Text} from "@tremor/react";
 import Chart1 from "@/components/Chart/DashboardChart1";
 import dayjs from "dayjs";
 import Chart2 from "@/components/Chart/DashboardChart2";
+import Image from "next/image";
 
-const cities = [
-    {
-        city: "Athens",
-        rating: "2 open PR",
-    },
-    {
-        city: "Luzern",
-        rating: "1 open PR",
-    },
-    {
-        city: "Zürich",
-        rating: "0 open PR",
-    },
-    {
-        city: "Vienna",
-        rating: "1 open PR",
-    },
-    {
-        city: "Ermatingen",
-        rating: "0 open PR",
-    },
-    {
-        city: "Lisbon",
-        rating: "0 open PR",
-    },
-];
 export default function Dashboard() {
     const [history, setHistory] = useState([])
 
@@ -66,7 +41,7 @@ export default function Dashboard() {
             })
             setHistory(response.data['data']['historyPallet'])
             setDataChart1(response.data.data['chartStok'])
-        }).catch(e =>{
+        }).catch(() =>{
             showErrorToast("Gagal Fetch Data");
         })
     }
@@ -104,7 +79,10 @@ export default function Dashboard() {
         <div className={`bg-white h-full`} ref={elemRef}>
             <div className={`bg-[#2589ce] py-1.5 px-2 text-white flex flex-row justify-between`}>
                 <div className={`flex flex-row justify-between w-full mr-1 items-center`}>
-                    <h2 className={`font-bold text-[18px]`}>PT VUTEQ INDONESIA</h2>
+                    <div className={`flex items-center gap-4`}>
+                        <Image src={'/logo.png'} alt={'Logo'} width={90} height={80} />
+                        <h2 className={`font-bold text-[18px]`}>PT VUTEQ INDONESIA</h2>
+                    </div>
                     <h2 className={`font-bold text-[14px]`}>Dasboard Status Pallet</h2>
                 </div>
                 <div
