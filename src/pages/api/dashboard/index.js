@@ -2,6 +2,9 @@ import Pallet from "@/models/Pallet";
 import checkCookieMiddleware from "@/pages/api/middleware";
 import Customer from "@/models/Customer";
 import History from "@/models/History";
+import {Op} from "sequelize";
+import moment from "moment";
+import * as sequelize from "sequelize";
 
 async function handler(req, res) {
     switch (req.method) {
@@ -81,6 +84,34 @@ async function handler(req, res) {
                     order: [['updated_at', 'DESC'], ['masuk', 'DESC']]
                 })
 
+                const paletMendep = await History.findAll({
+                    attributes: [
+                        [sequelize.literal('Pallet.customer'), 'customer'],
+                        [sequelize.fn('count', sequelize.col('History.id')),'total']
+                    ],
+                    where: {
+                        keluar: {
+                            [Op.lt] : moment().subtract(1, 'week').toDate(),
+                        }
+                    },
+                    include: [
+                        {
+                            model: Pallet
+                        }
+                    ],
+                    group: [sequelize.literal(('Pallet.customer'))]
+                })
+
+
+                const totalPaletMendep = await History.count({
+                    where: {
+                        keluar: {
+                            [Op.lt]: moment().subtract(1, 'week').toDate(),
+                        }
+                    }
+                });
+
+
                 res.status(200).json({
                     data : {
                         chartStok : customerPallets,
@@ -88,7 +119,9 @@ async function handler(req, res) {
                         totalStokPallet,
                         totalPalletKeluar,
                         totalPalletRepair,
-                        historyPallet
+                        historyPallet,
+                        totalPaletMendep,
+                        paletMendep
                     }
                 });
             } catch (error) {

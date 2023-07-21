@@ -15,7 +15,9 @@ export default function Dashboard() {
         stok: '-',
         total: '-',
         keluar:'-',
-        repair: '-'
+        repair: '-',
+        mendep: [],
+        totalMendep: 0
     })
     const [dataChart1, setDataChart1] = useState([])
     const elemRef = useRef(null);
@@ -37,7 +39,9 @@ export default function Dashboard() {
                 stok: response.data['data']['totalStokPallet'],
                 total: response.data['data']['totalPallet'],
                 keluar: response.data['data']['totalPalletKeluar'],
-                repair: response.data['data']['totalPalletRepair']
+                repair: response.data['data']['totalPalletRepair'],
+                totalMendep:response.data['data']['totalPaletMendep'],
+                mendep: response.data['data']['paletMendep']
             })
             setHistory(response.data['data']['historyPallet'])
             setDataChart1(response.data.data['chartStok'])
@@ -92,6 +96,23 @@ export default function Dashboard() {
                 </div>
             </div>
             <div className={`w-full p-5 h-full`}>
+                {
+                    cardInfo.totalMendep !== 0 && <div role="alert" className={`mb-3`}>
+                        <div className="bg-red-500 text-white font-bold rounded-t px-4 py-2 text-2xl">
+                            WARNING!!!
+                        </div>
+                        <div className="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700 text-xl">
+                            <p>{
+                                cardInfo.totalMendep
+                            } Pallet Belum Kembali ke Vuteq Lebih Dari Seminggu</p>
+                            <p className={`text-sm`}>{
+                                cardInfo.mendep.map(e=>(
+                                   `Customer ` + e.customer + ' = ' + e.total + ' Pallet, '
+                                ))
+                            }</p>
+                        </div>
+                    </div>
+                }
                 <div className={`grid-cols-4 pt-2 grid gap-5 text-white mb-5`}>
                     <Card className="bg-blue-500" >
                         <Text className={`text-xl text-white`}>Total Stok</Text>

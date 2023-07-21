@@ -84,6 +84,9 @@ export default function Index() {
                 <p className={`text-white mt-8`}>
                     Copyright © 2023
                 </p>
+                <p className={`text-white mt-2`}>
+                    Version 1.5.1
+                </p>
             </div>
         </>
     )
