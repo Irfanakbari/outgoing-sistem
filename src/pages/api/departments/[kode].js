@@ -1,10 +1,9 @@
-import Customer from "@/models/Customer";
 import checkCookieMiddleware from "@/pages/api/middleware";
 import Department from "@/models/Department";
 
 async function handler(req, res) {
     switch (req.method) {
-        case 'GET':
+        case 'DELETE':
             try {
                 if (req.user.role !== 'admin') {
                     res.status(401).json({
@@ -12,39 +11,15 @@ async function handler(req, res) {
                         data: "Role must be admin"
                     });
                 }
-                const customers = await Customer.findAll({
-                    include : {
-                        model: Department,
-                        attributes: ['name']
-                    },
-                    attributes: {
-                        exclude: ['department']
+                const departmentId = req.query.kode; // Anggap req.body.id berisi ID pelanggan yang akan dihapus
+                await Department.destroy({
+                    where: {
+                        kode: departmentId
                     }
-                })
+                });
                 res.status(200).json({
-                    ok : true,
-                    data : customers
-                })
-            } catch (e) {
-                res.status(500).json({
-                    ok : false,
-                    data : "Internal Server Error"
-                })
-            }
-            break;
-        case 'POST':
-            try {
-                if (req.user.role !== 'admin') {
-                    res.status(401).json({
-                        ok: false,
-                        data: "Role must be admin"
-                    });
-                }
-                const newCustomer = req.body; // Anggap req.body berisi data pelanggan baru
-                const customer = await Customer.create(newCustomer);
-                res.status(201).json({
                     ok: true,
-                    data: customer
+                    data: "Department deleted successfully"
                 });
             } catch (e) {
                 res.status(500).json({
@@ -53,7 +28,32 @@ async function handler(req, res) {
                 });
             }
             break;
-
+        case 'PUT':
+            try {
+                if (req.user.role !== 'admin') {
+                    res.status(401).json({
+                        ok: false,
+                        data: "Role must be admin"
+                    });
+                }
+                const departmentId = req.query.kode; // Anggap req.body.id berisi ID pelanggan yang akan dihapus
+                const newDepartment = req.body; // Anggap req.body berisi data pelanggan baru
+                await Department.update(newDepartment,{
+                    where: {
+                        kode : departmentId
+                    }
+                });
+                res.status(201).json({
+                    ok: true,
+                    data: "Success"
+                });
+            } catch (e) {
+                res.status(500).json({
+                    ok: false,
+                    data: "Internal Server Error"
+                });
+            }
+            break;
     }
 }
 

@@ -8,12 +8,12 @@ export default function DeleteModal({data, setCloseModal, action}) {
                    </div>
                    <div className={`mt-6 mb-6`}>
                                 <span className={`text-sm`}>
-                                    Yakin Hapus Data {data.username}?
+                                    Yakin Hapus Data {data.kode}?
                                  </span>
                    </div>
                    <div className={`flex flex-row justify-center gap-2 p-5`}>
                        <button onClick={async () => {
-                           await action(data.id)
+                           await action(data.kode)
                        }} className={`bg-[#f17373] w-full text-white py-1 text-sm rounded`}>Ok</button>
                        <button onClick={()=> setCloseModal(false)} className={`border w-full border-gray-500 py-1 text-sm rounded`}>Cancel</button>
                    </div>

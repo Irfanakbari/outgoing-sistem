@@ -5,10 +5,12 @@ const dataState = create((set) => ({
     listVehicle:[],
     listPart: [],
     listPallet:[],
+    listDepartment: [],
     setCustomer: (data) => set ({listCustomer: data}),
     setVehicle: (data) => set ({listVehicle: data}),
     setPart: (data) => set ({listPart: data}),
-    setPallet: (data) => set ({listPallet: data})
+    setPallet: (data) => set ({listPallet: data}),
+    setListDepartment: (data) => set ({listDepartment: data})
 }));
 
 const useStoreTab = create((set) => ({

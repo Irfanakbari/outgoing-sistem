@@ -113,6 +113,7 @@ export default function User() {
                                         <div className="flex flex-row w-full justify-between items-center gap-2">
                                             <label className="w-1/4">Role User :</label>
                                             <select {...register("role")} className="border border-gray-300 p-1 flex-grow" >
+                                                <option value={'admin'}>Super Admin</option>
                                                 <option value={'admin'}>Admin</option>
                                                 <option value={'operator'}>Operator</option>
                                             </select>

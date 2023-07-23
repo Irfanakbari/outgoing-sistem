@@ -1,5 +1,8 @@
 const master = [
     {
+        name: "Department"
+    },
+    {
         name: "Customer"
     },
     {

@@ -17,12 +17,13 @@ import {laporan, master} from "@/components/Menu/ListMenu";
 import {dataState, useStoreTab} from "@/context/states";
 import {showErrorToast, showSuccessToast} from "@/utils/toast";
 import {useRouter} from "next/router";
+import Department from "@/components/Page/Master/Department/Department";
 
 
 export default function Home() {
     const [user, setUser] = useState({})
     const { listTab, setCloseTab, activeMenu, setActiveMenu } = useStoreTab();
-    const {setCustomer, setVehicle, setPart, setPallet} = dataState()
+    const {setCustomer, setVehicle, setPart, setPallet, setListDepartment} = dataState()
     const router = useRouter()
 
 
@@ -45,6 +46,8 @@ export default function Home() {
         try {
             const response = await axios.get('/api/customers');
             setCustomer(response.data['data']);
+            const response1 = await axios.get('/api/departments');
+            setListDepartment(response1.data['data']);
             const response2 = await axios.get('/api/vehicle');
             setVehicle(response2.data['data']);
             const response3 = await axios.get('/api/parts');
@@ -93,14 +96,14 @@ export default function Home() {
                     <div className="w-full bg-white p-2 h-full overflow-y-scroll">
                         {
                             user.role === 'admin' ? <div className="bg-[#EBEBEB] p-2 h-full">
-                                {activeMenu === "Dashboard" ? <Dashboard /> : null}
-                                {activeMenu === "Customer" ? <Customer /> : null}
-                                {activeMenu === "Vehicle" ? <Vehicle /> : null}
-                                {activeMenu === "Part" ? <Part /> : null}
-                                {activeMenu === "Pallet" ? <Pallet /> : null}
-                                {activeMenu === "Lap. Riwayat Pallet" ? <LapRiwayat /> : null}
-                                {activeMenu === "Lap. Maintenance Pallet" ? <LapMaintenance /> : null}
-                                {activeMenu === "Users" ? <User /> : null}
+                                    {activeMenu === "Dashboard" ? <Dashboard /> : null}
+                                    {activeMenu === "Department" ? <Department /> : null}
+                                    {activeMenu === "Customer" ? <Customer /> : null}{activeMenu === "Vehicle" ? <Vehicle /> : null}
+                                    {activeMenu === "Part" ? <Part /> : null}
+                                    {activeMenu === "Pallet" ? <Pallet /> : null}
+                                    {activeMenu === "Lap. Riwayat Pallet" ? <LapRiwayat /> : null}
+                                    {activeMenu === "Lap. Maintenance Pallet" ? <LapMaintenance /> : null}
+                                    {activeMenu === "Users" ? <User /> : null}
                             </div>
                                 :
                                 <div

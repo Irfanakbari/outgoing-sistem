@@ -1,7 +1,6 @@
-import {BiEdit, BiPlusMedical, BiPrinter, BiRefresh, BiSolidUpArrow} from "react-icons/bi";
+import {BiEdit, BiPlusMedical, BiRefresh, BiSolidUpArrow} from "react-icons/bi";
 import {ImCross} from "react-icons/im";
 import {BsFillTrashFill} from "react-icons/bs";
-import {AiFillFileExcel} from "react-icons/ai";
 import axios from "axios";
 import {useEffect, useState} from "react";
 import DeleteModal from "@/components/Modal/DeleteModal";
@@ -147,14 +146,6 @@ export default function Part() {
                             className={`flex-row flex items-center gap-1 px-3 py-1 hover:bg-[#2589ce] hover:cursor-pointer`}>
                             <BsFillTrashFill size={12} />
                             <p className={`text-white font-bold text-sm`}>Hapus</p>
-                        </div>
-                        <div className={`flex-row flex items-center gap-1 px-3 py-1 hover:bg-[#2589ce] hover:cursor-pointer`}>
-                            <BiPrinter size={12} />
-                            <p className={`text-white font-bold text-sm`}>Cetak</p>
-                        </div>
-                        <div className={`flex-row flex items-center gap-1 px-3 py-1 hover:bg-[#2589ce] hover:cursor-pointer`}>
-                            <AiFillFileExcel size={12} />
-                            <p className={`text-white font-bold text-sm`}>Excel</p>
                         </div>
                         <div
                             onClick={()=> fetchData()}

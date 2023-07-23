@@ -1,4 +1,3 @@
-import Customer from "@/models/Customer";
 import checkCookieMiddleware from "@/pages/api/middleware";
 import Department from "@/models/Department";
 
@@ -12,18 +11,10 @@ async function handler(req, res) {
                         data: "Role must be admin"
                     });
                 }
-                const customers = await Customer.findAll({
-                    include : {
-                        model: Department,
-                        attributes: ['name']
-                    },
-                    attributes: {
-                        exclude: ['department']
-                    }
-                })
+                const departments = await Department.findAll()
                 res.status(200).json({
                     ok : true,
-                    data : customers
+                    data : departments
                 })
             } catch (e) {
                 res.status(500).json({
@@ -40,11 +31,11 @@ async function handler(req, res) {
                         data: "Role must be admin"
                     });
                 }
-                const newCustomer = req.body; // Anggap req.body berisi data pelanggan baru
-                const customer = await Customer.create(newCustomer);
+                const newDepartment = req.body; // Anggap req.body berisi data pelanggan baru
+                const department = await Department.create(newDepartment);
                 res.status(201).json({
                     ok: true,
-                    data: customer
+                    data: department
                 });
             } catch (e) {
                 res.status(500).json({

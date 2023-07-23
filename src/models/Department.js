@@ -1,8 +1,9 @@
 import connection from "@/config/database";
 import {DataTypes} from "sequelize";
+import Customer from "@/models/Customer";
 
 
-const Customer = connection.define('Customer', {
+const Department = connection.define('Department', {
     // Model attributes are defined here
     kode: {
         type: DataTypes.STRING,
@@ -11,13 +12,13 @@ const Customer = connection.define('Customer', {
     },
     name: {
         type: DataTypes.STRING
-    },
-    department: {
-        type: DataTypes.STRING
     }
 }, {
-    tableName: 'customer',
+    tableName: 'department',
     timestamps: false
 });
 
-export default Customer;
+Department.hasMany(Customer, {foreignKey: 'department'})
+Customer.belongsTo(Department, {foreignKey: 'department'})
+
+export default Department;
