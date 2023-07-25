@@ -7,9 +7,11 @@ import DeleteModal from "@/components/Modal/DeleteModal";
 import {FaRegWindowMaximize} from "react-icons/fa";
 import {showErrorToast, showSuccessToast} from "@/utils/toast";
 import {useForm} from "react-hook-form";
+import {dataState} from "@/context/states";
 
 export default function User() {
     const [dataUser, setDataUser] = useState([])
+    const {listDepartment} = dataState()
     const [selectedCell, setSelectedCell] = useState([])
     const [closeModal, setCloseModal] = useState(false)
     const [closeAddModal, setCloseAddModal] = useState(false)
@@ -113,10 +115,30 @@ export default function User() {
                                         <div className="flex flex-row w-full justify-between items-center gap-2">
                                             <label className="w-1/4">Role User :</label>
                                             <select {...register("role")} className="border border-gray-300 p-1 flex-grow" >
-                                                <option value={'admin'}>Super Admin</option>
+                                                <option value={'super'}>Super Admin</option>
                                                 <option value={'admin'}>Admin</option>
                                                 <option value={'operator'}>Operator</option>
                                             </select>
+                                        </div>
+                                        <div className="flex flex-row w-full justify-between items-center gap-2">
+                                            <label className="w-1/4">Department :</label>
+                                            <div className="border border-gray-300 p-1 flex-grow flex flex-col">
+                                                {
+                                                    listDepartment.map((e, index)=>(
+                                                        <label key={index}>
+                                                            <input
+                                                                type="checkbox"
+                                                                name="department"
+                                                                value={e.kode}
+                                                                {...register("department")}
+                                                            />
+                                                            {
+                                                                e.name
+                                                            }
+                                                        </label>
+                                                    ))
+                                                }
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="border border-gray-300 w-full p-3 flex flex-col gap-3 text-sm">

@@ -1,7 +1,7 @@
 import Customer from "@/models/Customer";
 import Pallet from "@/models/Pallet";
 import Vehicle from "@/models/Vehicle";
-import {Op} from "sequelize";
+import {Op, where} from "sequelize";
 import checkCookieMiddleware from "@/pages/api/middleware";
 import Part from "@/models/Part";
 
@@ -9,12 +9,13 @@ async function handler(req, res) {
     switch (req.method) {
         case 'GET':
             try {
-                if (req.user.role !== 'admin') {
-                    res.status(401).json({
+                if (req.user.role !== 'super' && req.user.role !== 'admin') {
+                    return res.status(401).json({
                         ok: false,
                         data: "Role must be admin"
                     });
                 }
+
                 const { customer, vehicle } = req.query;
                 // Menentukan parameter halaman dan batasan data
                 const page = parseInt(req.query.page) || 1; // Halaman saat ini (default: 1)
@@ -40,6 +41,12 @@ async function handler(req, res) {
                     };
                 }
 
+                if (req.user.role === 'admin') {
+                    // Jika user memiliki role 'admin', tambahkan filter berdasarkan department_id
+                    const allowedDepartments = req.department.map((department) => department.department_id);
+                    whereClause['$Vehicle.department$'] = { [Op.in]: allowedDepartments };
+                }
+
                 const pallets = await Pallet.findAndCountAll({
                     where: whereClause,
                     include: [Vehicle, Customer, Part],
@@ -63,20 +70,27 @@ async function handler(req, res) {
                 });
             }
             break;
+
         case 'POST':
-            const { vehicle, part, name, customer } = req.body;
+            const { part, name, total } = req.body;
 
             try {
-                if (req.user.role !== 'admin') {
+                if (req.user.role !== 'super' && req.user.role !== 'admin') {
                     res.status(401).json({
                         ok: false,
                         data: "Role must be admin"
                     });
                 }
+
+                const parts = await Part.findOne({
+                    where: {
+                        kode: part
+                    }
+                })
                 // Dapatkan data project berdasarkan kode_project
                 const vehicles = await Vehicle.findOne({
                     where: {
-                        kode: vehicle
+                        kode: parts.vehicle
                     }
                 });
 
@@ -85,13 +99,13 @@ async function handler(req, res) {
                 }
 
                 // Dapatkan daftar valet berdasarkan kode_project untuk mencari urutan kosong
-                const pallets = await Pallet.findAll({ where: { kode: { [Op.like]: `${customer}${vehicle}${part}%` } } });
+                const pallets = await Pallet.findAll({ where: { kode: { [Op.like]: `${parts.customer}${parts.vehicle}${part}%` } } });
 
                 let nextId;
                 if (pallets.length > 0) {
                     const palletNumbers = pallets.map(palet => {
                         const palletId = palet['kode'];
-                        const numberString = palletId.slice(customer.length + vehicle.length + part.length);
+                        const numberString = palletId.slice(parts.customer.length + parts.vehicle.length + part.length);
                         return parseInt(numberString);
                     });
 
@@ -112,16 +126,18 @@ async function handler(req, res) {
                     nextId = 1;
                 }
 
-                const nextIdFormatted = nextId.toString().padStart(3, '0');
-                const palletKode =  customer + vehicle + part + nextIdFormatted;
+                for (let i = 0; i < total; i++) {
+                    const nextIdFormatted = (nextId + i).toString().padStart(3, '0');
+                    const palletKode = parts.customer + parts.vehicle + part + nextIdFormatted;
 
-                await Pallet.create({
-                    kode: palletKode,
-                    name,
-                    vehicle: vehicle,
-                    part: part,
-                    customer: customer
-                });
+                    await Pallet.create({
+                        kode: palletKode,
+                        name,
+                        vehicle: parts.vehicle,
+                        part: part,
+                        customer: parts.customer
+                    });
+                }
 
                 res.status(200).json({ success: true });
 

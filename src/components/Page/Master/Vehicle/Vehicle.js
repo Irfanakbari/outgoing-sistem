@@ -106,7 +106,7 @@ export default function Vehicle() {
 
     return(
         <div className={`h-full bg-white`}>
-            {modalDelete && <DeleteModal data={selectedCell.kode} setCloseModal={setCloseModal} action={deleteData} />}
+            {modalDelete && <DeleteModal data={selectedCell} setCloseModal={setModalDelete} action={deleteData} />}
             {modalAdd && <AddModalLayout onSubmit={handleSubmit(submitData)} reset={reset} register={register} />}
             {modalEdit && (<EditModalLayout onSubmit={handleSubmit(editData)} reset={reset} register={register} selectedCell={selectedCell} />)}
                 <div className={`bg-[#2589ce] py-1.5 px-2 text-white flex flex-row justify-between`}>
@@ -170,6 +170,7 @@ export default function Vehicle() {
                                 <th className="py-2 bg-gray-100 text-left">Kode Vehicle</th>
                                 <th className="py-2 bg-gray-100 text-left">Nama Vehicle</th>
                                 <th className="py-2 bg-gray-100 text-left">Customer</th>
+                                <th className="py-2 bg-gray-100 text-left">Department</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -180,7 +181,8 @@ export default function Vehicle() {
                                             <td className="text-center p-1.5">{index+1}</td>
                                             <td>{e['kode']}</td>
                                             <td>{e['name']}</td>
-                                            <td>{e['customer']}</td>
+                                            <td>{e['customer'] + ' - ' + e['Customer']['name']}</td>
+                                            <td>{e['Department']['name']}</td>
                                         </tr>
                                     </>
                                 ))

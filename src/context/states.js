@@ -6,10 +6,12 @@ const dataState = create((set) => ({
     listPart: [],
     listPallet:[],
     listDepartment: [],
+    user: [],
     setCustomer: (data) => set ({listCustomer: data}),
     setVehicle: (data) => set ({listVehicle: data}),
     setPart: (data) => set ({listPart: data}),
     setPallet: (data) => set ({listPallet: data}),
+    setUser: (data) => set ({user: data}),
     setListDepartment: (data) => set ({listDepartment: data})
 }));
 

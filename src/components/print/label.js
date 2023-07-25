@@ -37,12 +37,10 @@ class LabelComponent extends React.Component {
                 <div className={`grow border-2 flex items-center justify center border-l-0 border-black`}>
                    <center>
                        <QRCode
-                           ecLevel={'Q'}
+                           ecLevel={'H'}
                            size={68}
-                           logoOpacity={0.5}
                            value={palletID}
                            qrStyle={'dots'}
-                           removeQrCodeBehindLogo={true}
                        />
                    </center>
                 </div>

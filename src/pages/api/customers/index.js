@@ -1,26 +1,18 @@
 import Customer from "@/models/Customer";
 import checkCookieMiddleware from "@/pages/api/middleware";
-import Department from "@/models/Department";
 
 async function handler(req, res) {
     switch (req.method) {
         case 'GET':
             try {
-                if (req.user.role !== 'admin') {
+                if (req.user.role !== 'super' && req.user.role !== 'admin') {
                     res.status(401).json({
                         ok: false,
                         data: "Role must be admin"
                     });
                 }
-                const customers = await Customer.findAll({
-                    include : {
-                        model: Department,
-                        attributes: ['name']
-                    },
-                    attributes: {
-                        exclude: ['department']
-                    }
-                })
+                let customers;
+                customers = await Customer.findAll();
                 res.status(200).json({
                     ok : true,
                     data : customers
@@ -34,7 +26,7 @@ async function handler(req, res) {
             break;
         case 'POST':
             try {
-                if (req.user.role !== 'admin') {
+                if (req.user.role !== 'super' && req.user.role !== 'admin') {
                     res.status(401).json({
                         ok: false,
                         data: "Role must be admin"

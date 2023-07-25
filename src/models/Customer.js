@@ -12,9 +12,6 @@ const Customer = connection.define('Customer', {
     name: {
         type: DataTypes.STRING
     },
-    department: {
-        type: DataTypes.STRING
-    }
 }, {
     tableName: 'customer',
     timestamps: false

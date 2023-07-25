@@ -15,7 +15,7 @@ const User = connection.define('User', {
     },
     role: {
         type: DataTypes.STRING,
-        defaultValue: 'admin'
+        defaultValue: 'operator'
     },
     password: {
         type: DataTypes.STRING

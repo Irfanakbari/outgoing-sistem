@@ -172,7 +172,6 @@ export default function Customer() {
                             <th className="py-2 bg-gray-100 text-center w-20">#</th>
                             <th className="py-2 bg-gray-100 text-left">Kode Customer (A~Z)</th>
                             <th className="py-2 bg-gray-100 text-left">Nama Customer</th>
-                            <th className="py-2 bg-gray-100 text-left">Departement</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -185,7 +184,6 @@ export default function Customer() {
                                 <td className="text-center p-1.5">{index + 1}</td>
                                 <td>{e['kode']}</td>
                                 <td>{e['name']}</td>
-                                <td>{e['Department']['name']}</td>
                             </tr>
                         ))}
                         </tbody>

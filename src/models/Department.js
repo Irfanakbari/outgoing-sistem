@@ -18,7 +18,5 @@ const Department = connection.define('Department', {
     timestamps: false
 });
 
-Department.hasMany(Customer, {foreignKey: 'department'})
-Customer.belongsTo(Department, {foreignKey: 'department'})
 
 export default Department;

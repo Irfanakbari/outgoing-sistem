@@ -26,7 +26,7 @@ export default function Dashboard() {
     useEffect(()=>{
         fetchData()
 
-        const interval = setInterval(fetchData, 4000); // Panggil fetchData setiap 3 detik
+        const interval = setInterval(fetchData, 5000); // Panggil fetchData setiap 3 detik
 
         return () => {
             clearInterval(interval); // Hentikan interval saat komponen dibongkar
@@ -36,15 +36,15 @@ export default function Dashboard() {
     const fetchData = () => {
         axios.get('/api/dashboard').then(response =>{
             setCardInfo({
-                stok: response.data['data']['totalStokPallet'],
-                total: response.data['data']['totalPallet'],
-                keluar: response.data['data']['totalPalletKeluar'],
-                repair: response.data['data']['totalPalletRepair'],
-                totalMendep:response.data['data']['totalPaletMendep'],
-                mendep: response.data['data']['paletMendep']
+                stok: response.data['data']['totalStokPallet'] ?? '-',
+                total: response.data['data']['totalPallet'] ?? '-',
+                keluar: response.data['data']['totalPalletKeluar'] ?? '-',
+                repair: response.data['data']['totalPalletRepair'] ?? '-',
+                totalMendep:response.data['data']['totalPaletMendep'] ?? 0,
+                mendep: response.data['data']['paletMendep'] ?? []
             })
-            setHistory(response.data['data']['historyPallet'])
-            setDataChart1(response.data.data['chartStok'])
+            setHistory(response.data['data']['historyPallet'] ?? [])
+            setDataChart1(response.data.data['chartStok'] ?? [])
         }).catch(() =>{
             showErrorToast("Gagal Fetch Data");
         })
@@ -97,7 +97,7 @@ export default function Dashboard() {
             </div>
             <div className={`w-full p-5 h-full`}>
                 {
-                    cardInfo.totalMendep !== 0 && <div role="alert" className={`mb-3`}>
+                    (cardInfo.totalMendep !== 0) && <div role="alert" className={`mb-3`}>
                         <div className="bg-red-500 text-white font-bold rounded-t px-4 py-2 text-2xl">
                             WARNING!!!
                         </div>

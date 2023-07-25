@@ -2,7 +2,7 @@ import Head from "next/head";
 import HeadTitle from "@/components/Head/HeadTitle";
 import {useEffect, useState} from "react";
 import Customer from "@/components/Page/Master/Customer/Customer";
-import Dashboard from "@/components/Page/Master/Dashboard";
+import Dashboard from "@/components/Page/Dashboard";
 import {ImCross} from "react-icons/im";
 import Pallet from "@/components/Page/Master/Pallet/Pallet";
 import LapRiwayat from "@/components/Page/Laporan/LapRiwayat";
@@ -21,9 +21,8 @@ import Department from "@/components/Page/Master/Department/Department";
 
 
 export default function Home() {
-    const [user, setUser] = useState({})
     const { listTab, setCloseTab, activeMenu, setActiveMenu } = useStoreTab();
-    const {setCustomer, setVehicle, setPart, setPallet, setListDepartment} = dataState()
+    const {setCustomer, setVehicle, setPart, setPallet, setListDepartment, user, setUser} = dataState()
     const router = useRouter()
 
 
@@ -60,7 +59,17 @@ export default function Home() {
     };
 
     function getCurrentUser(){
-        axios.get('/api/auth/user').then(r =>  setUser(r.data['data']));
+        axios.get('/api/auth/user').then(r =>  {
+            if (r.data['data'] === null){
+                axios.get('/api/auth/logout').then(async () => {
+                    showSuccessToast('Logout Berhasil')
+                    await router.replace('/').then(()=>router.reload)
+                }).catch(()=>{
+                    showErrorToast("Gagal Logout");
+                })
+            }
+            setUser(r.data['data'])
+        });
     }
 
     return (
@@ -79,14 +88,14 @@ export default function Home() {
                     </div>
                     <div className={`bg-[#3da0e3] w-full mt-2 flex pt-1 px-1`}>
                         {
-                            listTab.map(e=>{
+                            listTab.map((e, index)=>{
                                 return (
                                     <div
-                                        key={e}
+                                        key={index}
                                         onClick={() => setActiveMenu(e)}
                                         className={`${activeMenu === e ? "bg-white text-black" : "text-white"} flex items-center bg-[#2589ce] py-1 px-5 text-sm font-bold mr-2 hover:bg-white hover:text-black hover:cursor-pointer`}>
                                         {e} {
-                                            e !== 'Dashboard' ? <ImCross className={`ml-2`} size={10} onClick={()=>setCloseTab(e)} /> : null
+                                            e !== 'Dashboard' && <ImCross className={`ml-2`} size={10} onClick={()=>setCloseTab(e)} />
                                     }
                                     </div>
                                 )
@@ -95,15 +104,16 @@ export default function Home() {
                     </div>
                     <div className="w-full bg-white p-2 h-full overflow-y-scroll">
                         {
-                            user.role === 'admin' ? <div className="bg-[#EBEBEB] p-2 h-full">
-                                    {activeMenu === "Dashboard" ? <Dashboard /> : null}
-                                    {activeMenu === "Department" ? <Department /> : null}
-                                    {activeMenu === "Customer" ? <Customer /> : null}{activeMenu === "Vehicle" ? <Vehicle /> : null}
-                                    {activeMenu === "Part" ? <Part /> : null}
-                                    {activeMenu === "Pallet" ? <Pallet /> : null}
-                                    {activeMenu === "Lap. Riwayat Pallet" ? <LapRiwayat /> : null}
-                                    {activeMenu === "Lap. Maintenance Pallet" ? <LapMaintenance /> : null}
-                                    {activeMenu === "Users" ? <User /> : null}
+                            (user.role === 'admin' || user.role === 'super') ? <div className="bg-[#EBEBEB] p-2 h-full">
+                                    {activeMenu === "Dashboard" && <Dashboard />}
+                                    {activeMenu === "Department" && <Department />}
+                                    {activeMenu === "Customer" && <Customer />}
+                                    {activeMenu === "Vehicle" && <Vehicle />}
+                                    {activeMenu === "Part" && <Part />}
+                                    {activeMenu === "Pallet" && <Pallet />}
+                                    {activeMenu === "Lap. Riwayat Pallet" && <LapRiwayat />}
+                                    {activeMenu === "Lap. Maintenance Pallet" && <LapMaintenance />}
+                                    {activeMenu === "Users" && <User />}
                             </div>
                                 :
                                 <div

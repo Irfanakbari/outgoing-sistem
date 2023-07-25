@@ -1,36 +1,55 @@
 import Vehicle from "@/models/Vehicle";
 import checkCookieMiddleware from "@/pages/api/middleware";
-import Customer from "@/models/Customer";
 import {Op} from "sequelize";
+import Department from "@/models/Department";
+import Customer from "@/models/Customer";
 
 async function handler(req, res) {
     switch (req.method) {
         case 'GET':
             try {
-                if (req.user.role !== 'admin') {
-                    res.status(401).json({
+                if (req.user.role !== 'super' && req.user.role !== 'admin') {
+                    return res.status(401).json({
                         ok: false,
                         data: "Role must be admin"
                     });
                 }
-                const vehicles = await Vehicle.findAll({
-                    include: [Customer]
-                })
+
+                let vehicles;
+
+                if (req.user.role === 'super') {
+                    // Jika user memiliki role 'super', tampilkan semua data Vehicle tanpa batasan departemen
+                    vehicles = await Vehicle.findAll({
+                        include : [Department, Customer]
+                    });
+                } else if (req.user.role === 'admin') {
+                    // Jika user memiliki role 'admin', tampilkan data Vehicle dengan departemen yang sesuai
+                    const allowedDepartments = req.department.map((department) => department.department_id);
+
+                    vehicles = await Vehicle.findAll({
+                        where: {
+                            department: { [Op.in]: allowedDepartments }
+                        },
+                        include: [Customer, Department]
+                    });
+                }
+
                 res.status(200).json({
-                    ok : true,
-                    data : vehicles
-                })
+                    ok: true,
+                    data: vehicles
+                });
             } catch (e) {
                 res.status(500).json({
-                    ok : false,
-                    data : "Internal Server Error"
-                })
+                    ok: false,
+                    data: "Internal Server Error"
+                });
             }
             break;
+
         case 'POST':
-            const { name, customer} = req.body;
+            const { name, customer, department} = req.body;
             try {
-                if (req.user.role !== 'admin') {
+                if (req.user.role !== 'super' && req.user.role !== 'admin') {
                     res.status(401).json({
                         ok: false,
                         data: "Role must be admin"
@@ -70,7 +89,8 @@ async function handler(req, res) {
                 await Vehicle.create({
                     kode: palletKode,
                     name: name,
-                    customer: customer
+                    customer: customer,
+                    department: department
                 });
                 // Redirect ke halaman sukses atau halaman lain yang Anda inginkan
                 res.status(200).json({ success: true });

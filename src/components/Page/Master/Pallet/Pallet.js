@@ -13,6 +13,7 @@ import {dataState, modalState} from "@/context/states";
 import {useForm} from "react-hook-form";
 import AddModalLayout from "@/components/Page/Master/Pallet/AddModal";
 import QRModalLayout from "@/components/Page/Master/Pallet/QRModal";
+import PrintAll from "@/components/print/printall";
 export default function Pallet() {
     const {listCustomer, listVehicle, listPallet, setPallet} = dataState()
     const {setModalAdd, modalAdd,  modalDelete,setModalDelete, modalQr, setModalQR} = modalState()
@@ -38,7 +39,7 @@ export default function Pallet() {
     }, [])
 
     const fetchData = () => {
-        axios.get('/api/pallets?page=1').then(response=>{
+        axios.get(`/api/pallets?customer=${custFilter.current.value??''}&vehicle=${vehicleFilter.current.value??''}&page=1`).then(response=>{
            setPallet(response.data);
            setFilters(response.data['data'])
        }).catch(()=>{
@@ -87,7 +88,7 @@ export default function Pallet() {
 
     const handlePageChange = (selectedPage) => {
         // Lakukan perubahan halaman di sini
-        axios.get('/api/pallets?page=' + selectedPage).then(response=>{
+        axios.get(`/api/pallets?customer=${custFilter.current.value??''}&vehicle=${vehicleFilter.current.value??''}&page=` + selectedPage).then(response=>{
             setPallet(response.data);
             setFilters(response.data['data'])
         })
@@ -159,7 +160,7 @@ export default function Pallet() {
     }
 
     const getFilter = () => {
-        axios.get(`/api/pallets?customer=${custFilter.current.value}&vehicle=${vehicleFilter.current.value}&page=1`).then(response=>{
+        axios.get(`/api/pallets?customer=${custFilter.current.value??''}&vehicle=${vehicleFilter.current.value??''}&page=1`).then(response=>{
             setPallet(response.data);
             setFilters(response.data['data']);
         }).catch(()=>{
@@ -169,7 +170,7 @@ export default function Pallet() {
 
     return(
         <div className={`h-full bg-white`}>
-            {modalDelete && (<DeleteModal data={selectedCell.kode} setCloseModal={setModalDelete} action={deleteData} />)}
+            {modalDelete && (<DeleteModal data={selectedCell} setCloseModal={setModalDelete} action={deleteData} />)}
             {modalAdd && (<AddModalLayout onSubmit={handleSubmit(submitData)} reset={reset} register={register} />)}
             {modalQr && (<QRModalLayout selectedCell={selectedCell} />) }
             <div className={`bg-[#2589ce] py-1.5 px-2 text-white flex flex-row justify-between`}>
@@ -247,6 +248,7 @@ export default function Pallet() {
                         <p className={`text-white font-bold text-sm`}>Hapus</p>
                     </div>
                     <Print data={selectedCell} />
+                    <PrintAll data={filters} />
                     <div
                         onClick={onClick}
                         className={`flex-row flex items-center gap-1 px-3 py-1 hover:bg-[#2589ce] hover:cursor-pointer`}>
@@ -275,6 +277,7 @@ export default function Pallet() {
                         <th className="py-2 bg-gray-100 text-left">Customer</th>
                         <th className="py-2 bg-gray-100 text-left">Vehicle</th>
                         <th className="py-2 bg-gray-100 text-left">Part</th>
+                        <th className="py-2 bg-gray-100 text-left">Department</th>
                     </tr>
                     </thead>
                     <tbody className={`overflow-y-scroll`}>
@@ -290,6 +293,7 @@ export default function Pallet() {
                                     <td>{e['customer'] + ' - ' + e['Customer']['name']}</td>
                                     <td>{e['vehicle'] + ' - ' + e['Vehicle']['name']}</td>
                                     <td>{e['part'] + ' - ' + e['Part']['name']}</td>
+                                    <td>{'Produksi ' + e['Vehicle']['department']}</td>
                                 </tr>
                             </>
                         ))
