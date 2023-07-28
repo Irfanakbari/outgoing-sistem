@@ -18,7 +18,7 @@ export default function Index() {
             await axios.post('api/auth/login',{
                 username : username,
                 password : password,
-            }).then(r =>{
+            }).then(() =>{
                 toast.success("Login Sukses", {
                     position: "top-right",
                     autoClose: 2000,
@@ -85,7 +85,7 @@ export default function Index() {
                     Copyright © 2023
                 </p>
                 <p className={`text-white mt-2`}>
-                    Version 1.5.1
+                    Version 2.0.4
                 </p>
             </div>
         </>

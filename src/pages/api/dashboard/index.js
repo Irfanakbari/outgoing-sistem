@@ -2,10 +2,12 @@ import Pallet from "@/models/Pallet";
 import checkCookieMiddleware from "@/pages/api/middleware";
 import Customer from "@/models/Customer";
 import History from "@/models/History";
+import * as sequelize from "sequelize";
 import {Op} from "sequelize";
 import moment from "moment";
-import * as sequelize from "sequelize";
 import Vehicle from "@/models/Vehicle";
+import Department from "@/models/Department";
+import Part from "@/models/Part";
 
 async function handler(req, res) {
     switch (req.method) {
@@ -19,6 +21,8 @@ async function handler(req, res) {
                 }
 
                 let customers;
+                let departments;
+                let parts;
                 let historyPallet;
                 let totalPaletMendep;
                 let paletMendep;
@@ -30,6 +34,8 @@ async function handler(req, res) {
                 if (req.user.role === 'super') {
                     // Jika user memiliki role 'super', tampilkan semua data Customer tanpa batasan departemen
                     customers = await Customer.findAll();
+                    departments = await  Department.findAll()
+                    parts = await Part.findAll()
                     historyPallet = await History.findAll({
                         limit: 5,
                         include: [Pallet],
@@ -45,6 +51,7 @@ async function handler(req, res) {
                             keluar: {
                                 [Op.lt]: moment().subtract(1, 'week').toDate(),
                             },
+                            masuk: null
                         },
                         include: [
                             {
@@ -52,7 +59,12 @@ async function handler(req, res) {
                                 attributes: ['kode'],
                                 where: {
                                     status: 0
-                                }
+                                },
+                                include : [
+                                    {
+                                        model: Customer,
+                                    }
+                                ]
                             }
                         ],
                         group: [sequelize.literal('Pallet.customer')], // Mengganti 'Pallet.customer' dengan 'Customer.name'
@@ -64,6 +76,7 @@ async function handler(req, res) {
                             keluar: {
                                 [Op.lt]: moment().subtract(1, 'week').toDate(),
                             },
+                            masuk: null
                         },
                         include: {
                             model: Pallet,
@@ -96,6 +109,18 @@ async function handler(req, res) {
                     // Jika user memiliki role 'admin', tampilkan data Customer dengan departemen yang sesuai
                     const allowedDepartments = req.department.map((department) => department.department_id);
                     customers = await Customer.findAll()
+                    departments = await  Department.findAll()
+                    parts = await Part.findAll({
+                        include: [
+                            {
+                                model: Vehicle,
+                                attributes: ['name', 'department'], // Memuat atribut department_id dari Customer
+                                where: {
+                                    department: { [Op.in]: allowedDepartments }, // Filter berdasarkan department_id
+                                },
+                            },
+                        ],
+                    })
 
                     historyPallet = await History.findAll({
                         limit: 5,
@@ -339,28 +364,121 @@ async function handler(req, res) {
                     };
                 });
 
-
-                const customerPallets = await Promise.all(customerPromises);
-
-                res.status(200).json({
-                    data : {
-                        chartStok : customerPallets,
-                        totalPallet,
-                        totalStokPallet,
-                        totalPalletKeluar,
-                        totalPalletRepair,
-                        historyPallet,
-                        totalPaletMendep,
-                        paletMendep
+                const departmentPromises = departments.map( async (department) => {
+                    const palletCounts = {};
+                    palletCounts['total'] = await Pallet.count({
+                        include: {
+                            model: Vehicle,
+                            attributes: {
+                                include: ['department']
+                            },
+                        },
+                        where: {
+                            '$Vehicle.department$': department.kode ,
+                        },
+                    })
+                    palletCounts['keluar'] = await Pallet.count({
+                        include: {
+                            model: Vehicle,
+                            attributes: {
+                                include: ['department']
+                            },
+                        },
+                        where: {
+                            status: 0,
+                            '$Vehicle.department$': department.kode ,
+                        },
+                    })
+                    palletCounts['maintenance'] = await Pallet.count({
+                        include: {
+                            model: Vehicle,
+                            attributes: {
+                                include: ['department']
+                            },
+                        },
+                        where: {
+                            status: 3,
+                            '$Vehicle.department$': department.kode ,
+                        },
+                    })
+                    return {
+                        department: 'Prod. ' + department.kode,
+                        Total: palletCounts.total,
+                        Keluar:palletCounts.keluar,
+                        Maintenance:palletCounts.maintenance,
                     }
-                });
+                })
+
+                const partPromises = parts.map( async (part) => {
+                    const palletCounts = {};
+                    palletCounts['total'] = await Pallet.count({
+                        where: {
+                            '$part$': part.kode ,
+                        },
+                    })
+                    palletCounts['keluar'] = await Pallet.count({
+                        where: {
+                            status: 0,
+                            '$part$': part.kode ,
+                        },
+                    })
+                    palletCounts['maintenance'] = await Pallet.count({
+                        where: {
+                            status: 3,
+                            '$part$': part.kode ,
+                        },
+                    })
+                    return {
+                        part: `${part.kode} - ${part.name}`,
+                        Total: palletCounts.total,
+                        Keluar:palletCounts.keluar,
+                        Maintenance:palletCounts.maintenance,
+                    }
+                })
+
+               if (req.user.role === 'super') {
+                   const customerPallets = await Promise.all(customerPromises);
+                   const departmentPallets = await Promise.all(departmentPromises);
+                   const partPallets = await Promise.all(partPromises);
+
+                   res.status(200).json({
+                       data : {
+                           stokDepartment: departmentPallets,
+                           stokPart: partPallets,
+                           chartStok : customerPallets,
+                           totalPallet,
+                           totalStokPallet,
+                           totalPalletKeluar,
+                           totalPalletRepair,
+                           historyPallet,
+                           totalPaletMendep,
+                           paletMendep,
+                       }
+                   });
+               } else {
+                   const customerPallets = await Promise.all(customerPromises);
+                   const partPallets = await Promise.all(partPromises);
+                   res.status(200).json({
+                       data : {
+                           stokPart: partPallets,
+                           chartStok : customerPallets,
+                           totalPallet,
+                           totalStokPallet,
+                           totalPalletKeluar,
+                           totalPalletRepair,
+                           historyPallet,
+                           totalPaletMendep,
+                           paletMendep,
+                       }
+                   });
+               }
             } catch (error) {
-                console.error(error.message);
                 res.status(500).json({ error: 'Internal Server Error' });
             }
             break;
     }
 }
 const protectedAPIHandler = checkCookieMiddleware(handler);
+
 
 export default protectedAPIHandler;

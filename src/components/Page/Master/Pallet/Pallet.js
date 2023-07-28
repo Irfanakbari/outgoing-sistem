@@ -15,7 +15,7 @@ import AddModalLayout from "@/components/Page/Master/Pallet/AddModal";
 import QRModalLayout from "@/components/Page/Master/Pallet/QRModal";
 import PrintAll from "@/components/print/printall";
 export default function Pallet() {
-    const {listCustomer, listVehicle, listPallet, setPallet} = dataState()
+    const {listCustomer, listVehicle, listPallet, setPallet, listPart} = dataState()
     const {setModalAdd, modalAdd,  modalDelete,setModalDelete, modalQr, setModalQR} = modalState()
 
     const [selectedCell, setSelectedCell] = useState({})
@@ -25,6 +25,8 @@ export default function Pallet() {
 
     const custFilter = useRef(null);
     const vehicleFilter = useRef(null);
+    const partFilter = useRef(null);
+
 
     const {
         register,
@@ -39,7 +41,7 @@ export default function Pallet() {
     }, [])
 
     const fetchData = () => {
-        axios.get(`/api/pallets?customer=${custFilter.current.value??''}&vehicle=${vehicleFilter.current.value??''}&page=1`).then(response=>{
+        axios.get(`/api/pallets?customer=${custFilter.current.value??''}&vehicle=${vehicleFilter.current.value??''}&part=${partFilter.current.value??''}&page=1`).then(response=>{
            setPallet(response.data);
            setFilters(response.data['data'])
        }).catch(()=>{
@@ -88,7 +90,7 @@ export default function Pallet() {
 
     const handlePageChange = (selectedPage) => {
         // Lakukan perubahan halaman di sini
-        axios.get(`/api/pallets?customer=${custFilter.current.value??''}&vehicle=${vehicleFilter.current.value??''}&page=` + selectedPage).then(response=>{
+        axios.get(`/api/pallets?customer=${custFilter.current.value??''}&vehicle=${vehicleFilter.current.value??''}&part=${partFilter.current.value??''}&page=` + selectedPage).then(response=>{
             setPallet(response.data);
             setFilters(response.data['data'])
         })
@@ -160,7 +162,7 @@ export default function Pallet() {
     }
 
     const getFilter = () => {
-        axios.get(`/api/pallets?customer=${custFilter.current.value??''}&vehicle=${vehicleFilter.current.value??''}&page=1`).then(response=>{
+        axios.get(`/api/pallets?customer=${custFilter.current.value??''}&vehicle=${vehicleFilter.current.value??''}&part=${partFilter.current.value??''}&page=1`).then(response=>{
             setPallet(response.data);
             setFilters(response.data['data']);
         }).catch(()=>{
@@ -206,6 +208,19 @@ export default function Pallet() {
                             Semua
                         </option>
                         {listCustomer.map((e, index) => (
+                            <option className="text-sm p-4" key={index} value={e['kode']}>
+                                {`${e['kode']} - ${e['name']}`}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div className="flex flex-row items-center">
+                    <label className="text-sm font-semibold mr-3">Part :</label>
+                    <select ref={partFilter} className="border border-gray-300 rounded p-1 text-sm">
+                        <option className="text-sm" value="">
+                            Semua
+                        </option>
+                        {listPart.map((e, index) => (
                             <option className="text-sm p-4" key={index} value={e['kode']}>
                                 {`${e['kode']} - ${e['name']}`}
                             </option>

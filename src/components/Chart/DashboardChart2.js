@@ -2,25 +2,25 @@ import {BarChart, Card, Title} from "@tremor/react";
 
 export default function Chart2({data}) {
     return (<Card className={``}>
-        <Title>Diagram Total Pallet</Title>
+        <Title>Diagram Per Customer</Title>
         <BarChart
             className="mt-2"
             data={data}
             index="customer"
-            layout={'vertical'}
+            layout={'horizontal'}
             showXAxis={true}
             showTooltip={true}
             showLegend={true}
-            showGridLines={false}
+            showGridLines={true}
             showAnimation={true}
-            categories={["Total"]}
-            colors={["indigo"]}
-            yAxisWidth={40}
+            categories={["Tersedia", "Keluar", "Maintenance"]}
+            colors={["blue", "purple", "yellow"]}
+            yAxisWidth={60}
             stack={false}
             relative={false}
             startEndOnly={false}
             showYAxis={true}
-            maxValue={250}
+            // maxValue={250}
             autoMinValue={false}
         />
     </Card>)

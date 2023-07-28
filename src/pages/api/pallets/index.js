@@ -1,7 +1,7 @@
 import Customer from "@/models/Customer";
 import Pallet from "@/models/Pallet";
 import Vehicle from "@/models/Vehicle";
-import {Op, where} from "sequelize";
+import {Op} from "sequelize";
 import checkCookieMiddleware from "@/pages/api/middleware";
 import Part from "@/models/Part";
 
@@ -16,7 +16,7 @@ async function handler(req, res) {
                     });
                 }
 
-                const { customer, vehicle } = req.query;
+                const { customer, vehicle, part } = req.query;
                 // Menentukan parameter halaman dan batasan data
                 const page = parseInt(req.query.page) || 1; // Halaman saat ini (default: 1)
                 const limit = parseInt(req.query.limit) || 20; // Batasan data per halaman (default: 10)
@@ -26,18 +26,22 @@ async function handler(req, res) {
 
                 let whereClause = {}; // Inisialisasi objek kosong untuk kondisi where
 
-                if (customer && vehicle) {
+                if (customer) {
                     whereClause = {
-                        '$Customer.kode$': customer,
-                        '$Vehicle.kode$': vehicle,
-                    };
-                } else if (customer) {
-                    whereClause = {
+                        ...whereClause,
                         '$Customer.kode$': customer,
                     };
-                } else if (vehicle) {
+                }
+                if (vehicle) {
                     whereClause = {
+                        ...whereClause,
                         '$Vehicle.kode$': vehicle,
+                    };
+                }
+                if (part) {
+                    whereClause = {
+                        ...whereClause,
+                        '$Part.kode$': part,
                     };
                 }
 

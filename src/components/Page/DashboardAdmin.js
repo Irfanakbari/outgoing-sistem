@@ -2,14 +2,13 @@ import {BiFullscreen} from "react-icons/bi";
 import React, {useEffect, useRef, useState} from "react";
 import axios from "axios";
 import {showErrorToast} from "@/utils/toast";
-import {Card, Metric, Text} from "@tremor/react";
+import {Card, List, ListItem, Metric, Text} from "@tremor/react";
 import Chart1 from "@/components/Chart/DashboardChart1";
 import dayjs from "dayjs";
 import Chart2 from "@/components/Chart/DashboardChart2";
 import Image from "next/image";
-import Chart3 from "@/components/Chart/DashboardChart3";
 
-export default function Dashboard() {
+export default function DashboardAdmin() {
     const [history, setHistory] = useState([])
 
     const [cardInfo, setCardInfo] = useState({
@@ -22,7 +21,6 @@ export default function Dashboard() {
     })
     const [dataChart1, setDataChart1] = useState([])
     const [dataChart2, setDataChart2] = useState([])
-    const [dataChart3, setDataChart3] = useState([])
     const elemRef = useRef(null);
 
 
@@ -49,7 +47,6 @@ export default function Dashboard() {
             setHistory(response.data['data']['historyPallet'] ?? [])
             setDataChart1(response.data.data['stokPart'] ?? [])
             setDataChart2(response.data.data['chartStok'] ?? [])
-            setDataChart3(response.data.data['stokDepartment'] ?? [])
         }).catch(() =>{
             showErrorToast("Gagal Fetch Data");
         })
@@ -138,28 +135,28 @@ export default function Dashboard() {
                 </div>
                 <div className={`w-full grid grid-cols-2 gap-4`}>
                     <Chart2 data={dataChart2} />
-                    <Chart3 data={dataChart3} />
+                    {/*<Chart3 data={dataChart3} />*/}
 
-                    {/*<Card className={`overflow-y-scroll]`}>*/}
-                    {/*    <div className={`bg-red-800 text-white p-2 font-semibold`}>*/}
-                    {/*        Detail Stok*/}
-                    {/*    </div>*/}
-                    {/*   <div className={`flex`}>*/}
-                    {/*       <List className={`p-2`}>*/}
-                    {/*           {*/}
-                    {/*               dataChart1.map((item, index) => {*/}
-                    {/*                   if (index < 7) {*/}
-                    {/*                       return (*/}
-                    {/*                           <ListItem className={`text-sm`} key={item.customer}>*/}
-                    {/*                               <span>{item.customer}</span>*/}
-                    {/*                               <span>{item.Total} Pallet</span>*/}
-                    {/*                           </ListItem>*/}
-                    {/*                       )*/}
-                    {/*                   }*/}
-                    {/*               } )}*/}
-                    {/*       </List>*/}
-                    {/*   </div>*/}
-                    {/*</Card>*/}
+                    <Card className={`overflow-y-scroll]`}>
+                        <div className={`bg-red-800 text-white p-2 font-semibold`}>
+                            Detail Stok
+                        </div>
+                       <div className={`flex`}>
+                           <List className={`p-2`}>
+                               {
+                                   dataChart1.map((item, index) => {
+                                       if (index < 7) {
+                                           return (
+                                               <ListItem className={`text-sm`} key={item.customer}>
+                                                   <span>{item.customer}</span>
+                                                   <span>{item.Total} Pallet</span>
+                                               </ListItem>
+                                           )
+                                       }
+                                   } )}
+                           </List>
+                       </div>
+                    </Card>
                     <Chart1 data={dataChart1} />
                 </div>
                 <div className={`w-full`}>

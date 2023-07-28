@@ -25,7 +25,7 @@ export default function HeadTitle({user}) {
                     progress: undefined,
                     theme: "colored",
                 });
-                await router.replace('/')
+                await router.replace('/').then(()=> router.reload())
             })
 
         } catch (error) {

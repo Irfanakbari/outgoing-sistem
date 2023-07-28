@@ -1,11 +1,11 @@
 import Head from "next/head";
 import HeadTitle from "@/components/Head/HeadTitle";
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import Customer from "@/components/Page/Master/Customer/Customer";
 import Dashboard from "@/components/Page/Dashboard";
 import {ImCross} from "react-icons/im";
 import Pallet from "@/components/Page/Master/Pallet/Pallet";
-import LapRiwayat from "@/components/Page/Laporan/LapRiwayat";
+import LapRiwayat from "@/components/Page/Laporan/LapRiwayat/LapRiwayat";
 import LapMaintenance from "@/components/Page/Laporan/LapMaintenance";
 import User from "@/components/Page/Master/User";
 import {getCookie} from "cookies-next";
@@ -18,6 +18,7 @@ import {dataState, useStoreTab} from "@/context/states";
 import {showErrorToast, showSuccessToast} from "@/utils/toast";
 import {useRouter} from "next/router";
 import Department from "@/components/Page/Master/Department/Department";
+import DashboardAdmin from "@/components/Page/DashboardAdmin";
 
 
 export default function Home() {
@@ -105,7 +106,8 @@ export default function Home() {
                     <div className="w-full bg-white p-2 h-full overflow-y-scroll">
                         {
                             (user.role === 'admin' || user.role === 'super') ? <div className="bg-[#EBEBEB] p-2 h-full">
-                                    {activeMenu === "Dashboard" && <Dashboard />}
+                                    {activeMenu === "Dashboard" && user.role === 'super' && <Dashboard />}
+                                    {activeMenu === "Dashboard" && user.role === 'admin' && <DashboardAdmin />}
                                     {activeMenu === "Department" && <Department />}
                                     {activeMenu === "Customer" && <Customer />}
                                     {activeMenu === "Vehicle" && <Vehicle />}

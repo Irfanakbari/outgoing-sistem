@@ -39,7 +39,7 @@ async function handler(req, res) {
             }
             break;
 
-        case 'PUT':
+        case 'POST':
             const { kode } = req.body;
             try {
                 const pallet = await Pallet.findOne({

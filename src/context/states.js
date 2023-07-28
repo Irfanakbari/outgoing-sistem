@@ -41,13 +41,28 @@ const useStoreTab = create((set) => ({
 
 const modalState = create((set) => ({
     modalAdd: false,
+    modalFilter: false,
     modalEdit: false,
     modalDelete: false,
     modalQr: false,
     setModalAdd: (data) => set ({modalAdd: data}),
     setModalEdit: (data) => set ({modalEdit: data}),
     setModalDelete: (data) => set ({modalDelete: data}),
-    setModalQR: (data) => set ({modalQr: data})
+    setModalQR: (data) => set ({modalQr: data}),
+    setModalFilter: (data) => set ({modalFilter: data})
 }));
 
-export {dataState, useStoreTab, modalState}
+const filterState = create((set) => ({
+    custFilterValue: '',
+    vehicleFilterValue: '',
+    partFilterValue: '',
+    statusFilterValue: '',
+    startDateValue: '',
+    endDateValue: '',
+    setFilterValues: (values) => set(values),
+    setStartDateValue: (startDate) => set({ startDateValue: startDate }),
+    setEndDateValue: (endDate) => set({ endDateValue: endDate }),
+}));
+
+
+export {dataState, useStoreTab, modalState, filterState}

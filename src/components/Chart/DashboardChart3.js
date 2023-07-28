@@ -1,27 +1,27 @@
-import { Card, Title, BarChart } from "@tremor/react";
+import {BarChart, Card, Title} from "@tremor/react";
 
-
-export default function Chart1({data}) {
-    return (<Card className={`mb-5 col-span-2`}>
-        <Title>Diagram Stok Pallet Per Part</Title>
+export default function Chart3({data}) {
+    return (<Card className={``}>
+        <Title>Diagram Per Department</Title>
         <BarChart
             className="mt-2"
             data={data}
-            index="part"
-            showXAxis={false}
+            index="department"
+            layout={'vertical'}
+            showXAxis={true}
             showTooltip={true}
             showLegend={true}
-            showGridLines={true}
+            showGridLines={false}
             showAnimation={true}
             categories={["Total", "Keluar", "Maintenance"]}
             colors={["green", "red", "amber"]}
-            yAxisWidth={30}
+            yAxisWidth={65}
             stack={false}
             relative={false}
             startEndOnly={false}
             showYAxis={true}
+            // maxValue={250}
             autoMinValue={false}
         />
     </Card>)
 }
-

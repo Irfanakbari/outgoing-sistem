@@ -10,21 +10,23 @@ import {Op} from "sequelize";
 async function handler(req, res) {
     switch (req.method) {
         case 'GET':
-            const { customer, vehicle, page, start, end } = req.query;
+            const { customer, vehicle, page, start, end, search, part, status } = req.query;
             try {
                 if (req.user.role !== 'super' && req.user.role !== 'admin') {
-                    res.status(401).json({
+                    return res.status(401).json({
                         ok: false,
                         data: "Role must be admin"
                     });
                 }
+                let histories;
                 let whereClause = {}; // Inisialisasi objek kosong untuk kondisi where
 
 
-                if (customer && vehicle) {
+                if (customer && vehicle && part) {
                     whereClause = {
                         '$Pallet.Customer.kode$': customer,
                         '$Pallet.Vehicle.kode$': vehicle,
+                        '$Pallet.Part.kode$': vehicle,
                     };
                 } else if (customer) {
                     whereClause = {
@@ -34,6 +36,16 @@ async function handler(req, res) {
                     whereClause = {
                         '$Pallet.Vehicle.kode$': vehicle,
                     };
+                } else if (part) {
+                    whereClause = {
+                        '$Pallet.Part.kode$': vehicle,
+                    };
+                } else if (search) {
+                    whereClause = {
+                        'id_pallet': {
+                            [Op.substring]: search.toString()
+                        }
+                    }
                 }
 
                 if (start && end) {
@@ -70,31 +82,67 @@ async function handler(req, res) {
                     };
                 }
 
-
                 // Menghitung offset berdasarkan halaman dan batasan data
-                const offset = (parseInt(page) - 1) * 20;
+                const offset = (parseInt(page || 1) - 1) * 20;
 
-                const histories = await History.findAndCountAll({
-                    where: whereClause,
-                    include: [
-                        {
-                            model: Pallet,
-                            include: [
-                                {
-                                    model: Customer,
+                if (req.user.role === 'super') {
+                    // Jika user memiliki role 'super', tampilkan semua data Part tanpa batasan departemen
+                    histories = await History.findAndCountAll({
+                        where: whereClause,
+                        include: [
+                            {
+                                model: Pallet,
+                                where: status && {
+                                    status: status
                                 },
-                                {
-                                    model: Vehicle,
-                                },
-                                {
-                                    model: Part,
-                                },
-                            ],
+                                include: [
+                                    {
+                                        model: Customer,
+                                    },
+                                    {
+                                        model: Vehicle,
+                                    },
+                                    {
+                                        model: Part,
+                                    },
+                                ],
+                            },
+                        ],
+                        limit: 20,
+                        offset: offset,
+                    });
+                } else if (req.user.role === 'admin') {
+                    // Jika user memiliki role 'admin', tampilkan data Part dengan departemen yang sesuai
+                    const allowedDepartments = req.department.map((department) => department.department_id);
+
+                    histories = await History.findAndCountAll({
+                        where: {
+                            ...whereClause,
+                            '$Pallet.Vehicle.department$': { [Op.in]: allowedDepartments }
                         },
-                    ],
-                    limit: parseInt(20),
-                    offset: offset,
-                });
+                        include: [
+                            {
+                                model: Pallet,
+                                where: status && {
+                                    status: status,
+                                },
+                                include: [
+                                    {
+                                        model: Customer,
+                                    },
+                                    {
+                                        model: Vehicle,
+                                    },
+                                    {
+                                        model: Part,
+                                    },
+                                ],
+                            },
+                        ],
+                        limit: 20,
+                        offset: offset,
+                    });
+                }
 
                 const totalPages = Math.ceil(histories.count / parseInt(20));
 
@@ -105,6 +153,7 @@ async function handler(req, res) {
                     currentPage: parseInt(page),
                 });
             } catch (e) {
+                console.error(e.message);
                 res.status(500).json({
                     ok: false,
                     data: "Internal Server Error",
@@ -115,7 +164,6 @@ async function handler(req, res) {
         case 'POST':
             try {
                 const { kode } = req.body;
-
                 const pallet = await Pallet.findOne({
                     where: { kode: kode }
                 });
@@ -126,35 +174,29 @@ async function handler(req, res) {
                         data: "Pallet Sedang Berada Diluar"
                     });
                 }
-                else if (pallet.status === 3) {
+                if (pallet.status === 3) {
                     return res.status(400).json({
                         ok: false,
                         data: "Pallet Sedang Dalam Status Pemeliharaan"
                     });
                 }
-                else {
-                    await connection.transaction(async (t) => {
-                        // Update status pallet menjadi 0
-                        await Pallet.update(
-                            { status: 0 },
-                            { where: { kode: kode }, transaction: t }
-                        );
-
-                        // Buat data history baru
-                        await History.create(
-                            {
-                                id_pallet: kode,
-                                user_out: req.user.username
-                            },
-                            { transaction: t }
-                        );
-                        await t.commit()
-                    });
+                await connection.transaction(async t => {
+                    await Pallet.update(
+                        {status: 0},
+                        {where: {kode: kode}, transaction: t}
+                    );
+                    await History.create(
+                        {
+                            id_pallet: kode,
+                            user_out: req.user.username
+                        },
+                        {transaction: t}
+                    );
                     res.status(201).json({
                         ok: true,
                         data: "Sukses"
                     });
-                }
+                })
             } catch (e) {
                 res.status(500).json({
                     ok: false,
@@ -175,26 +217,24 @@ async function handler(req, res) {
                         data: "Pallet Sudah Masuk"
                     });
                 }
-                else if (pallet.status === 3) {
+                if (pallet.status === 3) {
                     return res.status(400).json({
                         ok: false,
                         data: "Pallet Sedang Dalam Status Pemeliharaan"
                     });
                 }
-
-                await connection.transaction(async (t) => {
-                    // Update status pallet menjadi 0
+                await connection.transaction(async t => {
                     await Pallet.update(
-                        { status: 1 },
-                        { where: { kode: kode }, transaction: t }
+                        {status: 1},
+                        {where: {kode: kode}, transaction: t}
                     );
-
                     // Buat data history baru
                     await History.update(
-                        { masuk: Date.now(), user_in: req.user.username},
-                        { where: { id_pallet: kode }, transaction: t }
+                        {masuk: Date.now(), user_in: req.user.username},
+                        {where: {id_pallet: kode}, transaction: t}
                     );
-                });
+                })
+
                 res.status(200).json({
                     ok: true,
                     data: "Sukses"
