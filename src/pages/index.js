@@ -29,7 +29,7 @@ export default function Index() {
                     progress: undefined,
                     theme: "colored",
                 });
-                router.push('/vuteq/home')
+                router.push('/home')
             })
         } catch (e) {
             toast.error(e.response.data['data'], {
@@ -85,7 +85,7 @@ export default function Index() {
                     Copyright © 2023
                 </p>
                 <p className={`text-white mt-2`}>
-                    Version 2.0.4
+                    Version 1.0.0
                 </p>
             </div>
         </>
@@ -93,10 +93,10 @@ export default function Index() {
 }
 
 export const getServerSideProps = ({ req, res }) => {
-    const cookie = getCookie('@vuteq-token', { req, res });
+    const cookie = getCookie('@vuteq-1-token', { req, res });
 
     if (cookie) {
-        res.writeHead(302, { Location: '/vuteq/home' });
+        res.writeHead(302, { Location: '/home' });
         res.end();
     }
 

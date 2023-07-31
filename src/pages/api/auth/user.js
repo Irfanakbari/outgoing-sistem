@@ -8,7 +8,6 @@ async function handler(req, res) {
                     ok: true,
                     data: req.user
                 });
-
             } catch (e) {
                 res.status(500).json({
                     ok: false,

@@ -1,39 +1,17 @@
 import React from "react";
 import {FaRegWindowMaximize} from "react-icons/fa";
 import {ImCross} from "react-icons/im";
-import {dataState, filterState, modalState} from "@/context/states";
+import {filterState, modalState} from "@/context/states";
 
 export default function FilterModal({ onSubmit }) {
     const {setModalFilter} = modalState()
-    const {listCustomer, listVehicle,listPart} = dataState()
     const {
-        custFilterValue,
-        vehicleFilterValue,
-        partFilterValue,
-        statusFilterValue,
         startDateValue,
         endDateValue,
-        setFilterValues,
         setStartDateValue,
         setEndDateValue,
     } = filterState();
 
-
-    const handleCustFilterChange = (event) => {
-        setFilterValues({ custFilterValue: event.target.value });
-    };
-
-    const handleVehicleFilterChange = (event) => {
-        setFilterValues({ vehicleFilterValue: event.target.value });
-    };
-
-    const handlePartFilterChange = (event) => {
-        setFilterValues({ partFilterValue: event.target.value });
-    };
-
-    const handleStatusFilterChange = (event) => {
-        setFilterValues({ statusFilterValue: event.target.value });
-    };
 
     // Handle changes to the startDate and endDate values
     const handleStartDateChange = (event) => {
@@ -59,61 +37,6 @@ export default function FilterModal({ onSubmit }) {
                 </div>
                 <div className="p-2 flex flex-col gap-5">
                     <div className="border border-gray-300 w-full p-3 flex flex-col gap-3 text-sm">
-                        <div className="flex flex-col justify-between gap-3">
-                            <div className="flex flex-col gap-2">
-                                <label className="text-sm font-semibold mr-3">Customer :</label>
-                                <select value={custFilterValue} onChange={handleCustFilterChange} className="border border-gray-300 rounded p-1 text-sm">
-                                    <option className="text-sm" value="">
-                                        Semua
-                                    </option>
-                                    {listCustomer.map((e, index) => (
-                                        <option className="text-sm p-4" key={index} value={e['kode']}>
-                                            {`${e['kode']} - ${e['name']}`}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <label className="text-sm font-semibold mr-3">Vehicle :</label>
-                                <select value={vehicleFilterValue} onChange={handleVehicleFilterChange} className="border border-gray-300 rounded p-1 text-sm">
-                                    <option className="text-sm" value="">
-                                        Semua
-                                    </option>
-                                    {listVehicle.map((e, index) => (
-                                        <option className="text-sm" key={index} value={e['kode']}>
-                                            {`${e['kode']} - ${e['name']}`}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <label className="text-sm font-semibold mr-3">Part :</label>
-                            <select value={partFilterValue} onChange={handlePartFilterChange} className="border border-gray-300 rounded p-1 text-sm">
-                                <option className="text-sm" value="">
-                                    Semua
-                                </option>
-                                {listPart.map((e, index) => (
-                                    <option className="text-sm" key={index} value={e['kode']}>
-                                        {`${e['kode']} - ${e['name']}`}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <label className="text-sm font-semibold mr-3">Status :</label>
-                            <select value={statusFilterValue} onChange={handleStatusFilterChange} className="border border-gray-300 rounded p-1 text-sm">
-                                <option className="text-sm" value="">
-                                    Semua
-                                </option>
-                                <option className="text-sm" value={'0'}>
-                                    Keluar
-                                </option>
-                                <option className="text-sm" value={'1'}>
-                                    Masuk
-                                </option>
-                            </select>
-                        </div>
                         <div className={`flex flex-col gap-2`}>
                             <label className="text-sm font-semibold mr-3">Tanggal Awal :</label>
                             <input value={startDateValue} onChange={handleStartDateChange} type={'date'} className={`border border-gray-300 rounded p-1 text-sm`} />

@@ -1,4 +1,4 @@
-## Pallet Control System
+## HPM Outgoing System
 
 Running instructions :
 
@@ -24,9 +24,4 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 - Zustand State Management
 
 ## Features
-- Control Pallet
-- Monitor Realtime Stock
-- Realtime Dashboard
-- Integrated with PDA Scanner (Flutter App)
-- Multi User
-- Export data to Excel
+- Dashboard riwayat outgoing part HPM

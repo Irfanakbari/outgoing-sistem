@@ -8,11 +8,10 @@ import {showErrorToast, showSuccessToast} from "@/utils/toast";
 import {dataState, modalState} from "@/context/states";
 import {useForm} from "react-hook-form";
 import AddModalLayout from "@/components/Page/Master/Part/AddModal";
-import EditModalLayout from "@/components/Page/Master/Part/EditModal";
 
 export default function Part() {
     const {setPart, listPart} = dataState()
-    const {setModalAdd, modalAdd, modalEdit, setModalEdit, modalDelete,setModalDelete} = modalState()
+    const {setModalAdd, modalAdd, modalDelete,setModalDelete} = modalState()
 
 
     const [selectedCell, setSelectedCell] = useState('')
@@ -63,17 +62,6 @@ export default function Part() {
         })
     }
 
-    const editData = (data) => {
-        axios.put('/api/parts/' + selectedCell.kode, data).then(() =>{
-            showSuccessToast("Sukses Edit Data");
-            fetchData()
-        }).catch(()=>{
-            showErrorToast("Gagal Edit Data");
-        }).finally(()=>{
-            setModalEdit(false)
-            reset()
-        })
-    }
 
     function searchValue(value) {
         if (value.trim() === '') {
@@ -100,7 +88,6 @@ export default function Part() {
         <div className={`h-full bg-white`}>
             {modalDelete && (<DeleteModal data={selectedCell} setCloseModal={setModalDelete} action={deleteData} />)}
             {modalAdd && (<AddModalLayout onSubmit={handleSubmit(submitData)} reset={reset} register={register} />)}
-            {modalEdit && (<EditModalLayout onSubmit={handleSubmit(editData)} reset={reset} register={register} selectedCell={selectedCell} />)}
                 <div className={`bg-[#2589ce] py-1.5 px-2 text-white flex flex-row justify-between`}>
                     <h2 className={`font-bold text-[14px]`}>Filter</h2>
                     <div className={`flex items-center`}>
@@ -136,12 +123,6 @@ export default function Part() {
                             <p className={`text-white font-bold text-sm`}>Baru</p>
                         </div>
                         <div
-                            onClick={()=>setModalEdit(true)}
-                            className={`flex-row flex items-center gap-1 px-3 py-1 hover:bg-[#2589ce] hover:cursor-pointer`}>
-                            <BiEdit size={12} />
-                            <p className={`text-white font-bold text-sm`}>Ubah</p>
-                        </div>
-                        <div
                             onClick={()=>setModalDelete(true)}
                             className={`flex-row flex items-center gap-1 px-3 py-1 hover:bg-[#2589ce] hover:cursor-pointer`}>
                             <BsFillTrashFill size={12} />
@@ -159,23 +140,16 @@ export default function Part() {
                             <thead>
                             <tr>
                                 <th className="py-2 bg-gray-100 text-center w-20">#</th>
-                                <th className="py-2 bg-gray-100 text-left">Kode Part (A~Z) (A~Z)</th>
-                                <th className="py-2 bg-gray-100 text-left">Nama Part</th>
-                                <th className="py-2 bg-gray-100 text-left">Customer</th>
-                                <th className="py-2 bg-gray-100 text-left">Vehicle</th>
+                                <th className="py-2 bg-gray-100 text-left">Kode Part</th>
                             </tr>
                             </thead>
                             <tbody>
                             {
                                 filters.map((e, index) =>(
                                     <>
-                                        <tr className={`${selectedCell.kode === e['kode'] ? 'bg-[#85d3ff]': ''} text-sm font-semibold border-b border-gray-500`} key={e['kode']} onClick={()=>setSelectedCell(e)}>
+                                        <tr className={`${selectedCell.id_part === e['id_part'] ? 'bg-[#85d3ff]': ''} text-sm font-semibold border-b border-gray-500`} key={e['id_part']} onClick={()=>setSelectedCell(e)}>
                                             <td className="text-center p-1.5">{index+1}</td>
-                                            <td>{e['kode']}</td>
-                                            <td>{e['name']}</td>
-                                            <td>{e['customer'] + ' - ' + e['Customer']['name']}</td>
-                                            <td>{e['vehicle'] + ' - ' + e['Vehicle']['name']}</td>
-
+                                            <td>{e['id_part']}</td>
                                         </tr>
                                     </>
                                 ))

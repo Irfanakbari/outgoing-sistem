@@ -14,10 +14,6 @@ export default function LapRiwayat() {
     const [dataHistory, setDataHistory] = useState([]);
     const {modalFilter,setModalFilter} = modalState()
     const {
-        custFilterValue,
-        vehicleFilterValue,
-        partFilterValue,
-        statusFilterValue,
         startDateValue,
         endDateValue,
     } = filterState();
@@ -35,7 +31,7 @@ export default function LapRiwayat() {
     const getHistory = async (e) => {
         e.preventDefault()
         try {
-            const response = await axios.get(`/api/history?customer=${custFilterValue}&vehicle=${vehicleFilterValue}&part=${partFilterValue}&status=${statusFilterValue}&start=${startDateValue}&end=${endDateValue}&page=1`);
+            const response = await axios.get(`/api/history?start=${startDateValue}&end=${endDateValue}&page=1`);
             setDataHistory(response.data);
             setFilters(response.data['data']);
         } catch (error) {
@@ -56,7 +52,7 @@ export default function LapRiwayat() {
 
     const handlePageChange = async (selectedPage) => {
         // Lakukan perubahan halaman di sini
-        const response3 = await axios.get(`/api/history?customer=${custFilterValue}&vehicle=${vehicleFilterValue}&part=${partFilterValue}&status=${statusFilterValue}&start=${startDateValue}&end=${endDateValue}&page=` + selectedPage);
+        const response3 = await axios.get(`/api/history?start=${startDateValue}&end=${endDateValue}&page=` + selectedPage);
         setDataHistory(response3.data);
         setFilters(response3.data['data'])
     };
@@ -67,23 +63,6 @@ export default function LapRiwayat() {
         setDataHistory(response.data);
         setFilters(response.data['data']);
     };
-
-    const isMoreThanAWeekAgoAndNoEntry = (keluar, masuk) => {
-        const oneWeekAgo = new Date();
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-        // Parse tanggal 'keluar' menjadi objek Date
-        const keluarDate = new Date(keluar);
-
-        // Memeriksa apakah 'keluarDate' lebih dari seminggu lalu
-        const isMoreThanAWeekAgo = keluarDate < oneWeekAgo;
-
-        // Memeriksa apakah 'masuk' kosong atau bernilai null
-        const isEntryEmpty = !masuk || false;
-
-        return isMoreThanAWeekAgo && isEntryEmpty;
-    };
-
 
     const saveExcel = async (e) => {
         e.preventDefault();
@@ -205,14 +184,8 @@ export default function LapRiwayat() {
 
             const row = sheet.addRow({
                 no: index + 1,
-                id: item.id_pallet,
-                customer: `${item['Pallet']['Customer'].kode} - ${item['Pallet']['Customer'].name}`,
-                vehicle: `${item['Pallet']['Vehicle'].kode} - ${item['Pallet']['Vehicle'].name}`,
-                part: `${item['Pallet']['Part'].kode} - ${item['Pallet']['Part'].name}`,
-                keluar: item['keluar'] ? dayjs(item['keluar']).locale('id').format('DD MMMM YYYY HH:mm') : '-',
-                user_out: item['user_out'],
-                masuk: item['masuk'] ? dayjs(item['masuk']).locale('id').format('DD MMMM YYYY HH:mm') : '-',
-                user_in: item['user_in'],
+                id: item.id_part,
+                masuk: item['timestamp'] ? dayjs(item['timestamp']).locale('id').format('DD MMMM YYYY HH:mm') : '-',
             });
             row.fill = rowFill
         });
@@ -284,33 +257,21 @@ export default function LapRiwayat() {
                     <thead>
                     <tr>
                         <th className="py-2 bg-gray-100 text-left w-10">#</th>
-                        <th className="py-2 bg-gray-100 text-left">Kode Pallet</th>
-                        <th className="py-2 bg-gray-100 text-left">Customer</th>
-                        <th className="py-2 bg-gray-100 text-left">Vehicle</th>
-                        <th className="py-2 bg-gray-100 text-left">Part</th>
-                        <th className="py-2 bg-gray-100 text-left">Keluar</th>
-                        <th className="py-2 bg-gray-100 text-left">Operator Out</th>
-                        <th className="py-2 bg-gray-100 text-left">Masuk</th>
-                        <th className="py-2 bg-gray-100 text-left">Operator In</th>
+                        <th className="py-2 bg-gray-100 text-left">ID Part</th>
+                        <th className="py-2 bg-gray-100 text-left">TimeStamp</th>
                     </tr>
                     </thead>
                     <tbody>
                     {
                         filters.map((e, index) => (
                             <tr
-                                className={`${selectedCell === index ? 'bg-[#85d3ff]' : ''} ${isMoreThanAWeekAgoAndNoEntry(e['keluar'], e['masuk']) ? 'bg-red-500 text-white' : ''} text-sm font-semibold border-b border-gray-500`}
+                                className={`${selectedCell === index ? 'bg-[#85d3ff]' : ''} text-sm font-semibold border-b border-gray-500`}
                                 key={index}
                                 onClick={() => setSelectedCell(index)}
                             >
                                 <td className="text-center p-1.5">{index + 1}</td>
-                                <td>{e['id_pallet']}</td>
-                                <td>{e['Pallet']['Customer']['kode'] + ' - ' + e['Pallet']['Customer']['name']}</td>
-                                <td>{e['Pallet']['Vehicle']['kode'] + ' - ' + e['Pallet']['Vehicle']['name']}</td>
-                                <td>{e['Pallet']['Part']['kode'] + ' - ' + e['Pallet']['Part']['name']}</td>
-                                <td>{e['keluar'] ? dayjs(e['keluar']).locale('id').format('DD MMMM YYYY HH:mm') : '-'}</td>
-                                <td>{e['user_out'] ?? '-'}</td>
-                                <td>{e['masuk'] ? dayjs(e['masuk']).locale('id').format('DD MMMM YYYY HH:mm') : '-'}</td>
-                                <td className="px-4">{e['user_in'] ?? '-'}</td>
+                                <td>{e['id_part']}</td>
+                                <td>{e['timestamp'] ? dayjs(e['timestamp']).locale('id').format('DD MMMM YYYY HH:mm') : '-'}</td>
                             </tr>
                         ))
                     }

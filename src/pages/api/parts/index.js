@@ -1,45 +1,11 @@
 import checkCookieMiddleware from "@/pages/api/middleware";
-import Customer from "@/models/Customer";
 import Part from "@/models/Part";
-import {Op} from "sequelize";
-import Vehicle from "@/models/Vehicle";
 
 async function handler(req, res) {
     switch (req.method) {
         case 'GET':
             try {
-                if (req.user.role !== 'super' && req.user.role !== 'admin') {
-                    return res.status(401).json({
-                        ok: false,
-                        data: "Role must be admin"
-                    });
-                }
-
-                let parts;
-                if (req.user.role === 'super') {
-                    // Jika user memiliki role 'super', tampilkan semua data Part tanpa batasan departemen
-                    parts = await Part.findAll({
-                        include: [Customer, Vehicle]
-                    });
-                } else if (req.user.role === 'admin') {
-                    // Jika user memiliki role 'admin', tampilkan data Part dengan departemen yang sesuai
-                    const allowedDepartments = req.department.map((department) => department.department_id);
-
-                    parts = await Part.findAll({
-                        include: [
-                            {
-                                model: Vehicle,
-                                where: {
-                                    '$department$': { [Op.in]: allowedDepartments }
-                                }
-                            },
-                            {
-                                model: Customer
-                            }
-                        ]
-                    });
-                }
-
+                const parts = await Part.findAll();
                 res.status(200).json({
                     ok: true,
                     data: parts
@@ -51,21 +17,11 @@ async function handler(req, res) {
                 });
             }
             break;
-
         case 'POST':
-            const { name, customer, kode, vehicle } = req.body;
+            const { id_part } = req.body;
             try {
-                if (req.user.role !== 'super' && req.user.role !== 'admin') {
-                    res.status(401).json({
-                        ok: false,
-                        data: "Role must be admin"
-                    });
-                }
                 await Part.create({
-                    kode: customer + kode,
-                    name: name,
-                    customer: customer,
-                    vehicle: vehicle
+                    id_part,
                 });
                 res.status(200).json({ success: true });
             } catch (error) {

@@ -8,23 +8,13 @@ const History = connection.define('History', {
         type: DataTypes.INTEGER,
         primaryKey: true,
     },
-    id_pallet: {
+    id_part: {
         type: DataTypes.STRING
-    },
-    user_in: {
-        type: DataTypes.STRING
-    },
-    user_out: {
-        type: DataTypes.STRING
-    },
-    masuk: {
-        type: DataTypes.DATE
     },
 }, {
     tableName: 'history',
-    updatedAt: 'updated_at',
-    createdAt: 'keluar'
+    createdAt: 'timestamp',
+    updatedAt: false
 });
-
 
 export default History;

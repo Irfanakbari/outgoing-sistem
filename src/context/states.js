@@ -16,9 +16,9 @@ const dataState = create((set) => ({
 }));
 
 const useStoreTab = create((set) => ({
-    activeMenu: "Dashboard",
+    activeMenu: "Riwayat Transaksi",
     setActiveMenu: (value) => set({ activeMenu: value }),
-    listTab: ['Dashboard'],
+    listTab: ['Riwayat Transaksi'],
     setNewTab: (value) => set(state => {
         if (!state.listTab.includes(value)) {
             return {

@@ -5,17 +5,13 @@ import { v4 as uuidv4 } from 'uuid';
 
 const User = connection.define('User', {
     // Model attributes are defined here
-    id: {
+    uid: {
         type: DataTypes.STRING,
         defaultValue: () => uuidv4(),
         primaryKey: true,
     },
     username: {
         type: DataTypes.STRING
-    },
-    role: {
-        type: DataTypes.STRING,
-        defaultValue: 'operator'
     },
     password: {
         type: DataTypes.STRING

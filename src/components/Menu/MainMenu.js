@@ -20,12 +20,6 @@ export default function MainMenu({title, data}) {
                 dropdown? <div className={`px-8 py-2 bg-white shadow-2xl shadow-gray-500 absolute flex flex-col gap-2 z-50`}>
                     {
                         data.map((e, index) => {
-                            if (e.name === 'Users' && user.role !== 'super') {
-                                return null;
-                            }
-                            if (e.name === 'Department' && user.role !== 'super') {
-                                return null;
-                            }
                             return (
                                 <span key={index} onClick={() => { setNewTab(e.name) }}>{e.name}</span>
                             );

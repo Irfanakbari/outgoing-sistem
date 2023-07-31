@@ -22,10 +22,9 @@ export default async function handler(req, res) {
                     const isValid = await bcrypt.compare(credential.password, user.password)
                     if (isValid) {
                         const token = jwt.sign({
-                            id: user.id,
-                            role: user.role
+                            uid: user.uid,
                         }, 'vuteqcorp',{ expiresIn: '1y' });
-                        setCookie('@vuteq-token', token,{req, res, httpOnly: true, maxAge: 60 * 60 * 24 * 90});
+                        setCookie('@vuteq-1-token', token,{req, res, httpOnly: true, maxAge: 60 * 60 * 24 * 90});
                         res.status(200).json({
                             ok: true,
                             data: "Login Successfully",
