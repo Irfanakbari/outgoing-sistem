@@ -1,7 +1,6 @@
 import Head from "next/head";
 import HeadTitle from "@/components/Head/HeadTitle";
 import {useEffect} from "react";
-import Dashboard from "@/components/Page/Dashboard";
 import {ImCross} from "react-icons/im";
 import LapRiwayat from "@/components/Page/Laporan/LapRiwayat/LapRiwayat";
 import User from "@/components/Page/Master/User";

@@ -1,18 +1,10 @@
 import {create} from "zustand";
 
 const dataState = create((set) => ({
-    listCustomer:[],
-    listVehicle:[],
     listPart: [],
-    listPallet:[],
-    listDepartment: [],
     user: [],
-    setCustomer: (data) => set ({listCustomer: data}),
-    setVehicle: (data) => set ({listVehicle: data}),
     setPart: (data) => set ({listPart: data}),
-    setPallet: (data) => set ({listPallet: data}),
     setUser: (data) => set ({user: data}),
-    setListDepartment: (data) => set ({listDepartment: data})
 }));
 
 const useStoreTab = create((set) => ({
@@ -48,7 +40,6 @@ const modalState = create((set) => ({
     setModalAdd: (data) => set ({modalAdd: data}),
     setModalEdit: (data) => set ({modalEdit: data}),
     setModalDelete: (data) => set ({modalDelete: data}),
-    setModalQR: (data) => set ({modalQr: data}),
     setModalFilter: (data) => set ({modalFilter: data})
 }));
 
@@ -59,7 +50,6 @@ const filterState = create((set) => ({
     statusFilterValue: '',
     startDateValue: '',
     endDateValue: '',
-    setFilterValues: (values) => set(values),
     setStartDateValue: (startDate) => set({ startDateValue: startDate }),
     setEndDateValue: (endDate) => set({ endDateValue: endDate }),
 }));
