@@ -48,8 +48,8 @@ export default function Home() {
                     <HeadTitle user={user} />
                     <div className={`p-2`}>
                         <div className={`w-full flex bg-[#EBEBEB] text-sm font-bold`}>
-                            <MainMenu data={master} title={'Master Data'}/>
-                            <MainMenu data={laporan} title={'Laporan'}/>
+                            {/*<MainMenu data={master} title={'Master Data'}/>*/}
+                            {/*<MainMenu data={laporan} title={'Laporan'}/>*/}
                         </div>
                     </div>
                     <div className={`bg-[#3da0e3] w-full mt-2 flex pt-1 px-1`}>
@@ -59,7 +59,7 @@ export default function Home() {
                                     <div
                                         key={index}
                                         onClick={() => setActiveMenu(e)}
-                                        className={`${activeMenu === e ? "bg-white text-black" : "text-white"} flex items-center bg-[#2589ce] py-1 px-5 text-sm font-bold mr-2 hover:bg-white hover:text-black hover:cursor-pointer`}>
+                                        className={`${activeMenu === e ? "bg-white text-black" : "text-white"} flex items-center just bg-[#2589ce] py-1 px-5 text-sm font-bold mr-2 hover:bg-white hover:text-black hover:cursor-pointer`}>
                                         {e} {
                                             e !== 'Riwayat Transaksi' && <ImCross className={`ml-2`} size={10} onClick={()=>setCloseTab(e)} />
                                     }

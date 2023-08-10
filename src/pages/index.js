@@ -85,7 +85,7 @@ export default function Index() {
                     Copyright © 2023
                 </p>
                 <p className={`text-white mt-2`}>
-                    Version 1.0.0
+                    Version 1.1.0
                 </p>
             </div>
         </>
