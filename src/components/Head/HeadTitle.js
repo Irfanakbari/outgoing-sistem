@@ -50,7 +50,7 @@ export default function HeadTitle({user}) {
                     :
                     null
             }
-            <div className={`w-full bg-[#3da0e3] py-1.5 px-2 text-white flex flex-row justify-between items-center mb-2`}>
+            <div className={`w-full bg-[#00DD94] py-1.5 px-2 text-white flex flex-row justify-between items-center mb-2`}>
                 <div className={`flex items-center gap-3`}>
                     <Image src={'/logo.png'} alt={'Logo'} width={90} height={80} />
                     <h2 className={`font-bold text-[14px]`}>PT VUTEQ INDONESIA - HPM Outgoing System</h2>

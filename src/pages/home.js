@@ -52,7 +52,7 @@ export default function Home() {
                             {/*<MainMenu data={laporan} title={'Laporan'}/>*/}
                         </div>
                     </div>
-                    <div className={`bg-[#3da0e3] w-full mt-2 flex pt-1 px-1`}>
+                    <div className={`bg-[#00DD94] w-full mt-2 flex pt-1 px-1`}>
                         {
                             listTab.map((e, index)=>{
                                 return (

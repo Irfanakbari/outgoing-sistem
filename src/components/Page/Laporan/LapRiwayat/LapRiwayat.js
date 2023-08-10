@@ -203,7 +203,7 @@ export default function LapRiwayat() {
 
     return (
         <div className="h-full bg-white">
-            <div className="bg-[#2589ce] py-1.5 px-2 text-white flex flex-row justify-between">
+            <div className="bg-[#00DD94] py-1.5 px-2 text-white flex flex-row justify-between">
                 <h2 className="font-bold text-[14px]">Filter</h2>
                 <div className="flex items-center">
                     <BiSolidUpArrow size={10} />
@@ -235,20 +235,20 @@ export default function LapRiwayat() {
             </div>
             <div className="w-full bg-white h-4 border border-gray-500" />
             <div className="w-full bg-white p-2">
-                <div className="w-full bg-[#3da0e3] py-0.5 px-1 text-white flex flex-row">
-                    <div className="flex-row flex items-center gap-1 px-3 py-1 hover:bg-[#2589ce] hover:cursor-pointer">
+                <div className="w-full bg-[#00B8A7] py-0.5 px-1 text-white flex flex-row">
+                    <div className="flex-row flex items-center gap-1 px-3 py-1 hover:bg-[#0092A1] hover:cursor-pointer">
                         <BiPrinter size={12} />
                         <p className="text-white font-bold text-sm">Cetak</p>
                     </div>
-                    <div onClick={saveExcel} className="flex-row flex items-center gap-1 px-3 py-1 hover:bg-[#2589ce] hover:cursor-pointer">
+                    <div onClick={saveExcel} className="flex-row flex items-center gap-1 px-3 py-1 hover:bg-[#0092A1] hover:cursor-pointer">
                         <AiFillFileExcel size={12} />
                         <p className="text-white font-bold text-sm">Excel</p>
                     </div>
-                    <div onClick={fetchData} className="flex-row flex items-center gap-1 px-3 py-1 hover:bg-[#2589ce] hover:cursor-pointer">
+                    <div onClick={fetchData} className="flex-row flex items-center gap-1 px-3 py-1 hover:bg-[#0092A1] hover:cursor-pointer">
                         <BiRefresh size={12} />
                         <p className="text-white font-bold text-sm">Refresh</p>
                     </div>
-                    <div onClick={()=>setModalFilter(true)} className="flex-row flex items-center gap-1 px-3 py-1 hover:bg-[#2589ce] hover:cursor-pointer">
+                    <div onClick={()=>setModalFilter(true)} className="flex-row flex items-center gap-1 px-3 py-1 hover:bg-[#0092A1] hover:cursor-pointer">
                         <BiFilter size={12} />
                         <p className="text-white font-bold text-sm">Filter</p>
                     </div>
@@ -265,7 +265,7 @@ export default function LapRiwayat() {
                     {
                         filters.map((e, index) => (
                             <tr
-                                className={`${selectedCell === index ? 'bg-[#85d3ff]' : ''} text-sm font-semibold border-b border-gray-500`}
+                                className={`${selectedCell === index ? 'bg-[#00DD94]' : ''} text-sm font-semibold border-b border-gray-500`}
                                 key={index}
                                 onClick={() => setSelectedCell(index)}
                             >

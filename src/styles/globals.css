@@ -5,3 +5,11 @@
 body {
     background-color: #EBEBEB
 }
+
+::-webkit-scrollbar {
+    width: 5px; /* Atur lebar scrollbar */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #888; /* Warna thumb (bagian yang dapat di-drag) */
+}
