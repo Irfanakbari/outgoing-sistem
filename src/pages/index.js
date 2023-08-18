@@ -82,7 +82,7 @@ export default function Index() {
 
 // Fungsi untuk mendapatkan props server-side
 export const getServerSideProps = ({ req, res }) => {
-    const cookie = getCookie('@vuteq-token', { req, res });
+    const cookie = getCookie('@vuteq-1-token', { req, res });
 
     // Jika cookie sudah ada (pengguna sudah login), maka arahkan ke halaman home
     if (cookie) {

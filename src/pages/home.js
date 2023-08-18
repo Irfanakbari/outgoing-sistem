@@ -7,8 +7,6 @@ import User from "@/components/Page/Master/User";
 import {getCookie} from "cookies-next";
 import axios from "axios";
 import Part from "@/components/Page/Master/Part/Part";
-import MainMenu from "@/components/Menu/MainMenu";
-import {laporan, master} from "@/components/Menu/ListMenu";
 import {dataState, useStoreTab} from "@/context/states";
 import {showErrorToast, showSuccessToast} from "@/utils/toast";
 import {useRouter} from "next/router";
